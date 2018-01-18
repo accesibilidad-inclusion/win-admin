@@ -1,0 +1,11 @@
+vendor/
+node_modules/
+npm-debug.log
+yarn-error.log
+htdocs/public/storage
+htdocs/public/hot
+htdocs/storage/*.key
+.env.*.php
+htdocs/.env.php
+htdocs/.env
+
