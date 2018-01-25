@@ -28,11 +28,11 @@ class StoreQuestion extends FormRequest
             'formulation'          => 'required|max:255',
 			'dimension'            => 'required|integer|exists:dimensions,id',
 			'needs_especification' => 'nullable|boolean',
-			'specification'        => 'nullable|string',
+			'specification'        => 'nullable|string|max:255',
 			'category'             => 'required|integer|exists:categories,id',
-			'assistances'          => 'required|array|integer|exists:assistances,id',
-			'options_yes.*'        => 'string',
-			'options_no.*'         => 'string'
+			'assistances.*'        => 'required|integer|exists:assistances,id',
+			'options_yes.*'        => 'string|max:255',
+			'options_no.*'         => 'string|max:255'
         ];
     }
 }

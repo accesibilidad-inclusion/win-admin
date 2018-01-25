@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Question;
-use App\Assistance;
 use App\Category;
 use App\Dimension;
+use App\Assistance;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreQuestion;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class QuestionsController extends Controller
@@ -33,14 +34,28 @@ class QuestionsController extends Controller
 
     /**
      * Show the form for creating a new resource.
-     *
+     * @param  Request $request
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-		$dimensions = Dimension::all();
+        return view('questions.create', [
+			'assistances' => Assistance::all(),
+			'categories'  => Category::all(),
+			'dimensions'  => $this->getDimensionsOptions(),
+			'question'    => new Question
+		]);
+    }
+
+	/**
+	 * Get an array with all possible dimensions and indicators
+	 * @return array Array of dimensions and indicators
+	 */
+	private function getDimensionsOptions()
+	{
+		$dimensions           = Dimension::all();
 		$dimensions_by_parent = $dimensions->groupBy('parent_id');
-		$dimensions_options = [];
+		$dimensions_options   = [];
 		foreach ( $dimensions_by_parent->get(0) as $val ) {
 			$dimensions_options[ $val->id ] = [
 				'optlabel' => $val->label,
@@ -52,24 +67,17 @@ class QuestionsController extends Controller
 				$dimensions_options[ $val->parent_id ]['options'][ $val->id ] = $val->label;
 			}
 		}
-
-        return view('questions.create', [
-			'assistances' => Assistance::all(),
-			'categories'  => Category::all(),
-			'dimensions'  => $dimensions_options
-		]);
-    }
+		return $dimensions_options;
+	}
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  StoreQuestion $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreQuestion $request)
     {
-		dd( $request );
-
 		$question = new Question;
 		$question->formulation = $request->input('formulation');
 		$question->needs_specification = $request->input('needs_specification');
@@ -110,7 +118,7 @@ class QuestionsController extends Controller
 		}
 		$question->options()->createMany( $options_no );
 
-		dd( $question );
+		return Redirect::route('questions.index', ['created' => $question->id], 303);
     }
 
     /**
@@ -132,19 +140,25 @@ class QuestionsController extends Controller
      */
     public function edit(Question $question)
     {
-        dd( $question, $question->assistances );
+		$question->load('assistances', 'options', 'dimension', 'category');
+		return view('questions.create', [
+			'assistances' => Assistance::all(),
+			'categories'  => Category::all(),
+			'dimensions'  => $this->getDimensionsOptions(),
+			'question'    => $question
+		]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  StoreQuestion  $request
      * @param  \App\Question  $question
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Question $question)
+    public function update(StoreQuestion $request, Question $question)
     {
-        //
+        dd( $question );
     }
 
     /**

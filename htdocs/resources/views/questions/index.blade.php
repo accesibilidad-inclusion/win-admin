@@ -1,17 +1,4 @@
-@extends('layouts.app')
-
-@section('sidebar')
-	<nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar mt-3">
-		<ul class="nav nav-pills flex-column">
-			<li class="nav-item">
-				<a href="{{ route('questions.index') }}" class="nav-link">Listado</a>
-			</li>
-			<li class="nav-item">
-				<a href="{{ route('questions.create') }}" class="nav-link">Crear nueva pregunta</a>
-			</li>
-		</ul>
-	</nav>
-@endsection
+@extends('questions.layout')
 
 @section('content')
 	<div class="container">
