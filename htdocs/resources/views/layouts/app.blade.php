@@ -23,27 +23,27 @@
 			@guest
 			<div class="collapse navbar-collapse" id="navbarsExampleDefault">
 				<ul class="navbar-nav mr-auto">
-					<li class="nav-item"><a href="{{ route('login') }}">Login</a></li>
-					<li class="nav-item"><a href="{{ route('register') }}">Registrarse</a></li>
+					<li class="nav-item"><a href="{{ route('login') }}" class="nav-link">Login</a></li>
+					<li class="nav-item"><a href="{{ route('register') }}" class="nav-link">Registrarse</a></li>
 				</ul>
 			</ul>
 			@else
 			<div class="collapse navbar-collapse" id="navbarsExampleDefault">
 				<ul class="navbar-nav mr-auto">
-					<li class="nav-item">
-						<a class="nav-link" href="{{ route('home') }}">Tablero</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="">Usuarios</a>
+					<li class="nav-item d-none d-sm-inline-block">
+						<a href="{{ route('home') }}" class="nav-link{{ Request::is('home') ? ' active' : '' }}">Tablero</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="">Resultados</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="{{ route('questions.index') }}">Preguntas</a>
+						<a class="nav-link" href="#">Eventos</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="">Investigadores</a>
+						<a href="{{ route('questions.index') }}" class="nav-link{{ Request::is('questions*') ? ' active' : ''}}">Preguntas</a>
+					</li>
+					<li class="nav-item">
+						<a href="{{ route('users.index')}}" class="nav-link{{ Request::is('users*') ? ' active' : '' }}">Usuarios</a>
 					</li>
 				</ul>
 			</ul>
@@ -60,10 +60,12 @@
 					</form>
 				</div>
 			</div>
+			{{--
 			<form class="form-inline mt-2 mt-md-0">
 				<input class="form-control mr-sm-2" placeholder="Search" aria-label="Search" type="text">
 				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
 			</form>
+			--}}
 			@endguest
 		</div>
 	</nav>
@@ -81,10 +83,13 @@
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="{{ asset('js/app.js') }}"></script>
+{{--<script src="{{ asset('js/app.js') }}"></script>}}
 {{-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script>window.jQuery || document.write('<script src="../../../../assets/js/vendor/jquery.min.js"><\/script>')</script>
 <script src="../../../../assets/js/vendor/popper.min.js"></script>
 <script src="../../../../dist/js/bootstrap.min.js"></script> --}}
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </body>
 </html>
