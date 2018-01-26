@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreQuestion;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Option;
 
 class QuestionsController extends Controller
 {
@@ -173,17 +174,22 @@ class QuestionsController extends Controller
 
 		$question->load('options');
 
-		foreach ( $request->input('options_yes') as $order => $label ) {
-			$option = $question->options->where('type', 'yes')->firstWhere('order', $order);
-			$option->label = $label;
-			$option->save();
+		foreach ( ['yes', 'no'] as $type ) {
+			foreach ( $request->input("options_{$type}") as $order => $label ) {
+				$option = $question->options->where('type', $type)->firstWhere('order', $order);
+				if ( ! $option ) {
+					$option = new Option;
+					$option->label = $label;
+					$option->order = $order;
+					$option->type  = $type;
+					$option->question_id = $question->id;
+				} else {
+					$option->label = $label;
+				}
+				$option->save();
+			}
 		}
 
-		foreach ( $request->input('options_no') as $order => $label ) {
-			$option = $question->options->where('type', 'no')->firstWhere('order', $order);
-			$option->label = $label;
-			$option->save();
-		}
 		return Redirect::route('questions.edit', $question, 303);
     }
 

@@ -70,7 +70,7 @@
 					<div class="form-group">
 						<div class="input-group options__yes">
 							<span class="answer-options input-group-addon">{{ $i }}</span>
-							<input id="option_yes_{{ $i }}" class="form-control{{ $errors->has("options_yes.{$i}") ? ' is-invalid' : '' }}" name="options_yes[{{$i}}]" placeholder="Opción Sí {{$i}}" required type="text" maxlength="255" value="{{ old('options_yes.'. $i, $question->options->where('type', 'yes')->pluck('label')->get( $i - 1 ) )}}">
+							<input id="option_yes_{{ $i }}" class="form-control{{ $errors->has("options_yes.{$i}") ? ' is-invalid' : '' }}" name="options_yes[{{$i}}]" placeholder="Opción Sí {{$i}}" required type="text" maxlength="255" value="{{ old('options_yes.'. $i, $question->options->where('type', 'yes')->sortBy('order')->pluck('label')->get( $i - 1 ) )}}">
 						</div>
 					</div>
 					@endfor
@@ -81,7 +81,7 @@
 					<div class="form-group">
 						<div class="input-group options__no">
 							<span class="answer-options input-group-addon">{{ $i }}</span>
-							<input id="option_no_{{ $i }}" class="form-control{{ $errors->has("options_no.{$i}") ? ' is-invalid' : '' }}" name="options_no[{{$i}}]" placeholder="Opción No {{$i}}" required type="text" maxlength="255" value="{{ old('options_no.'. $i, $question->options->where('type', 'no')->pluck('label')->get( $i - 1 ) ) }}">
+							<input id="option_no_{{ $i }}" class="form-control{{ $errors->has("options_no.{$i}") ? ' is-invalid' : '' }}" name="options_no[{{$i}}]" placeholder="Opción No {{$i}}" required type="text" maxlength="255" value="{{ old('options_no.'. $i, $question->options->where('type', 'no')->sortBy('order')->pluck('label')->get( $i - 1 ) ) }}">
 						</div>
 					</div>
 					@endfor
