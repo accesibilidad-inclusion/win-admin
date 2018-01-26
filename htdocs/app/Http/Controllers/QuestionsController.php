@@ -83,10 +83,10 @@ class QuestionsController extends Controller
 		$question->needs_specification = $request->input('needs_specification');
 		$question->specification = $request->input('specification');
 
-		$dimension   = Dimension::find( $request->input('dimension' ) );
+		$dimension = Dimension::find( $request->input('dimension' ) );
 		$question->dimension()->associate( $dimension );
 
-		$category    = Category::find( $request->input('category') );
+		$category = Category::find( $request->input('category') );
 		$question->category()->associate( $category );
 
 		$question->save();
@@ -158,7 +158,33 @@ class QuestionsController extends Controller
      */
     public function update(StoreQuestion $request, Question $question)
     {
-        dd( $question );
+		$question->formulation = $request->input('formulation');
+		$question->needs_specification = $request->input('needs_specification');
+		$question->specification = $request->input('specification');
+		$dimension = Dimension::find( $request->input('dimension' ) );
+		$question->dimension()->associate( $dimension );
+
+		$category = Category::find( $request->input('category') );
+		$question->category()->associate( $category );
+
+		$question->save();
+
+		$question->assistances()->sync( $request->input('assistances') );
+
+		$question->load('options');
+
+		foreach ( $request->input('options_yes') as $order => $label ) {
+			$option = $question->options->where('type', 'yes')->firstWhere('order', $order);
+			$option->label = $label;
+			$option->save();
+		}
+
+		foreach ( $request->input('options_no') as $order => $label ) {
+			$option = $question->options->where('type', 'no')->firstWhere('order', $order);
+			$option->label = $label;
+			$option->save();
+		}
+		return Redirect::route('questions.edit', $question, 303);
     }
 
     /**
