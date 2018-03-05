@@ -9,3 +9,4 @@ htdocs/storage/*.key
 htdocs/.env.php
 htdocs/.env
 
+.vscode/
