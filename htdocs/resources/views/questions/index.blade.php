@@ -21,5 +21,6 @@
 				</div>
 			</div>
 		@endforeach
+		{{ $questions->links() }}
 	</div>
 @endsection

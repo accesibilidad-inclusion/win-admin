@@ -19,8 +19,18 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::resources([
-	'questions' => 'QuestionsController'
+	'questions'    => 'QuestionController',
+	'users'        => 'UserController',
+	'events'       => 'EventController',
+	'institutions' => 'InstitutionController',
+	'subjects'     => 'SubjectController',
+	'scripts'      => 'ScriptController'
 ]);
+
+// Route::get('/users', 'UsersController@index')->name('users.index');
+// Route::get('/users/create', 'UsersController@create')->name('users.create');
+// Route::get('/users/{user}/edit', 'UsersController@edit')->name('users.edit');
+// Route::delete('/users/{user}', 'UsersController@destroy')->name('users.destroy');
 
 Route::prefix('api/v1')->group(function() {
 	Route::get('/questions', function(){

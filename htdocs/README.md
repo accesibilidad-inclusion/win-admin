@@ -1,138 +1,101 @@
 # Preguntas sobre estructura de datos y reglas de negocio
 
-* Describir roles de Usuario: usuario, investigador, admin (a qué cosa puede acceder o qué acciones puede realizar cada tipo de usuario)
-* ¿Un usuario sólo puede contestar 1 vez el cuestionario?
-* ¿Las "dimensiones" de una pregunta son entidades separadas de los "indicadores" o sólo corresponden a una forma de agrupar los indicadores? Si son entidades separadas, ¿en qué se diferencian?
-* Una pregunta, ¿siempre tiene 3 respuestas "sí" y 3 respuestas "no"?
-* El orden de las respuestas, ¿debe ser editable?
-* Las alternativas de "especificación", ¿siempre son "En el hogar", "Fuera del Hogar" y "Siempre"?
-* ¿A qué corresponden las siguientes entidades presentes en la base de datos: "amigos", "token_amistad", "trabajo_investigador"?
-* ¿A qué objetos se asocian las "region", "provincia" y "comuna" existentes en la base de datos?
-* ¿Qué datos se deben recolectar de los usuarios que contestan el cuestionario?
-* ¿Cuál es el objetivo de la integración con Facebook en la app de cuestionario?
-
 ---
 
-# Questions ("preguntas")
+# Modelos
 
-## Esquema
+## Sujeto
 
 * id
-* enunciado - Enunciado: string
-* necesita_especificacion - Necesita especificación: bool
-* especificacion - Especificación: string
-* orden: smallint
-
-## Relaciones
-
-* hasOne Pregunta_Dimension
-* hasOne Pregunta_Categoria
-* hasMany Pregunta_Area_Apoyo
-* hasMany Pregunta_Respuesta
-
+* Doc. identidad
+* Nombre
+* Apellidos
+* Sexo
+* Fecha nacimiento
+* datetime consentimiento → nullable
+* geolocalización
+* institución
+* última conexión
+* Discapacidad → json(?)
+  + cognitiva
+  + visual
+  + auditiva
+  + otra
+* ocupación → json(?)
+  + Trabaja?
+  + Dónde Trabaja
+  + Estudia?
+  + Dónde estudia
 ---
+* id rrss
+* red rrss
+* token auth rrss
 
-# Dimension
-
-# Esquema
+## Aplicación
 
 * id
-* label
+* subject_id
+* evento_id
+* hash (identificador del dispositivo) → unique
+* created_at
+* updated_at
 
-## Relaciones
+## Evento
 
-* belongsToMany Pregunta
+* Nombre
+* Fecha de inicio
+* Fecha de término(?)
+* Estado
+* Hash
+* → Institución asociada
+* → Creador (investigador)
 
-## Elementos (→ Indicadores)
+## Institución
 
-* Autonomía
- + Realización de Elecciones
- + Toma de Decisiones
- + Resolución de Problemas
-* Autorregulación
- + Establecimiento de Metas
- + Autoinstrucción
- + Autoevaluación
-* Creencias de Control-Eficacia
- + Autodefensa
- + Locus de Control Interno
- + Expectativas de Logro
- + Atribuciones de Eficacia
-* Autorrealización
- + Autoconocimiento
+* Nombre
+* → Eventos
 
----
+## Roles de usuario
 
-# Category (categoría)
+> Describen agrupaciones de permisos
 
-## Esquema
+### Investigador
 
-* id
-* label
+* Puede ver todos los resultados
+* Crea eventos y cerrar eventos
+* Puede crear instituciones
 
-## Pivot: pregunta_categoria
+### Director
 
-* pregunta_id
-* categoria_id
+* Crea usuarios en la institución
+* Puede ver todos los resultados de su institución
+* Está asociado a una o más instituciones
+* Sólo puede ver los que están asociados a sus aplicaciones (no los de la institución)
+* No puede exportar datos
 
-## Relaciones
+### Profesor
 
-* belongsToMany Pregunta
+* Puede ver los resultados de su nivel
+* Está asociado a una o más instituciones
 
-## Elementos
+### Aplicador
 
-* Voluntad
-* Competencia
-* Oportunidad
-* Apoyo
+* Se asocia a un evento, pero no tiene permisos de lectura
+* No está asociado a una institución
+* aplicador_evento Many To Many
 
----
+## Permisos
 
-# assistance (Área de Apoyo)
+## Eventos
 
-## Elementos
+> Describen a una aplicación guiada y controlada del cuestionario.
+> Un "evento" se relaciona a una o más instituciones, a través de las cuales se delegan permisos a directores, profesores y aplicadores
 
-* Desarrollo humano
-* Enseñanza y educación
-* Vida en el hogar
-* Vida en comunidad
-* Empleo
-* Salud y seguridad
-* Actividades conductuales
-* Actividades sociales
-* Protección y defensa
+## Instituciones
 
----
+> Colegios u otras organizaciones donde se realiza un evento
 
-# option (Opciones)
+## Guiones
 
-## Esquema
-
-* pregunta_tipo: enum [si, no]
-* label: varchar
-* order: tinyint
-
-## Relaciones
-* belongsTo Pregunta
-
----
-
-# Respuestas
-
-## Esquema
-
-* id (bigint)
-* pregunta_id
-* value
-* start_time/end_time || duration || duration_sec // response_time (?)
-
----
-
-# Apoyos
-
-* respuesta_id
-* apoyo_id
-
-# Especificaciones
-
-* En el hogar, fuera del hogar, siempre
+> Describen los guiones para la aplicación del cuestionario, ya sea asociado a un evento o de forma autónoma
+> Inicialmente existe solo un guión único, determinado por el orden de las preguntas

@@ -12,11 +12,18 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-			QuestionsTableSeeder::class,
+            UsersTableSeeder::class,
+
+            // todo lo necesario para generar las preguntas
 			DimensionsTableSeeder::class,
 			CategoriesTableSeeder::class,
 			AssistancesTableSeeder::class,
-			AidsTableSeeder::class
+            AidsTableSeeder::class,
+            QuestionsTableSeeder::class,
+
+            // sujetos de prueba
+            ImpairmentsTableSeeder::class,
+            SubjectsTableSeeder::class
 		]);
     }
 }

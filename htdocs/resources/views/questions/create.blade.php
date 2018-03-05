@@ -42,7 +42,7 @@
 					<label for="category" class="col-form-label">Categoría</label>
 					<select name="category" id="category" class="form-control">
 						@foreach ( $categories as $category )
-						<option value="{{ $category->id }}"{{ old('category') == $category->id ? ' selected="selected"' : '' }}>
+						<option value="{{ $category->id }}"{{ old('category', $question->category_id ) == $category->id ? ' selected="selected"' : '' }}>
 							{{ $category->label }}
 						</option>
 						@endforeach

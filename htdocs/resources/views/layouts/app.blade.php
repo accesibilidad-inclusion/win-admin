@@ -34,16 +34,16 @@
 						<a href="{{ route('home') }}" class="nav-link{{ Request::is('home') ? ' active' : '' }}">Tablero</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="">Resultados</a>
+						<a href="{{ route('subjects.index') }}" class="nav-link{{ Request::is('subjects*') ? ' active' : '' }}">Resultados</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="#">Eventos</a>
+						<a href="{{ route('events.index') }}" class="nav-link{{ Request::is('events*', 'institutions*') ? ' active' : '' }}">Eventos</a>
 					</li>
 					<li class="nav-item">
 						<a href="{{ route('questions.index') }}" class="nav-link{{ Request::is('questions*') ? ' active' : ''}}">Preguntas</a>
 					</li>
 					<li class="nav-item">
-						<a href="{{ route('users.index')}}" class="nav-link{{ Request::is('users*') ? ' active' : '' }}">Usuarios</a>
+						<a href="{{ route('users.index')}}" class="nav-link{{ Request::is('users*') ? ' active' : '' }}">Investigadores</a>
 					</li>
 				</ul>
 			</ul>

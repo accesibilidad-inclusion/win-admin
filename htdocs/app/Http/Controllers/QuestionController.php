@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Option;
 
-class QuestionsController extends Controller
+class QuestionController extends Controller
 {
 
 	use SoftDeletes;
@@ -29,7 +29,7 @@ class QuestionsController extends Controller
     public function index()
     {
 		return view('questions.index', [
-			'questions' => Question::latest()->take(10)->get()
+			'questions' => Question::latest()->paginate( 10 )
 		]);
     }
 
