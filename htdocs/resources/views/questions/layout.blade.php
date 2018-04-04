@@ -10,7 +10,7 @@
 			<a href="{{ route('questions.create') }}" class="nav-link{{ Request::routeIs('questions.create') ? ' active' : ''}}">Crear nueva pregunta</a>
 		</li>
 		<li class="nav-item">
-			<a href="{{ route('scripts.edit', 1) }}" class="nav-link">Ordenar guión</a>
+			<a href="{{ route('scripts.edit', 1) }}" class="nav-link{{ Request::routeIs('scripts.edit') ? ' active' : ''}}">Ordenar guión</a>
 		</li>
 	</ul>
 </nav>

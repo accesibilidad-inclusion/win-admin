@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Http\Request;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -31,14 +33,3 @@ Route::resources([
 // Route::get('/users/create', 'UsersController@create')->name('users.create');
 // Route::get('/users/{user}/edit', 'UsersController@edit')->name('users.edit');
 // Route::delete('/users/{user}', 'UsersController@destroy')->name('users.destroy');
-
-Route::prefix('api/v1')->group(function() {
-	Route::get('/questions', function(){
-		$questions = App\Question::with(['category', 'dimension', 'options', 'assistances'])->get();
-		return $questions->toJson();
-	});
-	Route::get('/questions/{id}', function($id){
-		$question = App\Question::with(['category', 'dimension', 'options', 'assistances'])->find($id);
-		return $question->toJson();
-	});
-});

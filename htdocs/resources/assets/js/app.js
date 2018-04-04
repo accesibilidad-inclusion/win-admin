@@ -7,7 +7,16 @@
 
 // require('./bootstrap');
 //
-// window.Vue = require('vue');
+window.Vue = require('vue');
+import vuedraggable from 'vuedraggable';
+Vue.component('draggable', vuedraggable);
+Vue.component(
+	'selectize',
+	require('./components/SelectizeComponent.vue')
+);
+const _ = require('lodash');
+const axios = require('axios');
+
 //
 // /**
 //  * Next, we will create a fresh Vue application instance and attach it to
@@ -17,6 +26,40 @@
 //
 // Vue.component('example-component', require('./components/ExampleComponent.vue'));
 //
-// const app = new Vue({
-//     el: '#app'
-// });
+
+// questions-spotlig
+const QuestionsSpotlight = new Vue({
+	el: '#questions-spotlight',
+	data: {
+		options: [],
+		questions: []
+	},
+	methods: {
+		onSearch( search, loading ) {
+			loading( true );
+			this.search( loading, search, this );
+		},
+		selectedQuestion: function( val ) {
+			this.$children.forEach(element => {
+				if ( element.$el.className.indexOf('searchable') !== -1 ) {
+					element.$el.val = '';
+					element.$emit('focus');
+				}
+			});
+			if ( val ) {
+				this.questions.push( val );
+				this.options = [];
+			}
+		},
+		search: _.debounce( (loading, search, vm) => {
+			axios.get('/api/v1/questions', {
+				params : {
+					'search' : search
+				}
+			}).then(function( response ){
+				vm.options = response.data;
+				loading( false );
+			});
+		}, 350 )
+	}
+});

@@ -14,7 +14,7 @@ class ScriptController extends Controller
      */
     public function index()
     {
-        //
+
     }
 
     /**
@@ -46,7 +46,7 @@ class ScriptController extends Controller
      */
     public function show(Script $script)
     {
-        //
+
     }
 
     /**
@@ -57,7 +57,7 @@ class ScriptController extends Controller
      */
     public function edit(Script $script)
     {
-        //
+        return view('scripts.edit', $script);
     }
 
     /**

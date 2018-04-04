@@ -9,6 +9,7 @@ class Question extends Model
 {
 	use SoftDeletes;
 	protected $dates = ['deleted_at', 'created_at', 'updated_at'];
+	protected $hidden = ['deleted_at', 'created_at', 'updated_at', 'status', 'order'];
 	protected $casts = [
 		'needs_specification' => 'boolean',
 		'dimension'           => 'integer',

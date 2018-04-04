@@ -23,7 +23,10 @@ class DatabaseSeeder extends Seeder
 
             // sujetos de prueba
             ImpairmentsTableSeeder::class,
-            SubjectsTableSeeder::class
+            SubjectsTableSeeder::class,
+
+            // Guión predeterminado
+            ScriptsTableSeeder::class
 		]);
     }
 }
