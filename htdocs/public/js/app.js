@@ -1093,7 +1093,11 @@ var QuestionsSpotlight = new Vue({
 	methods: {
 		addQuestion: function addQuestion(val) {
 			if (val) {
-				this.questions.push(val);
+				if (!_.find(this.questions, function (item) {
+					return item.id == val.id;
+				})) {
+					this.questions.push(val);
+				}
 			}
 		},
 		addStage: function addStage() {
@@ -1102,6 +1106,11 @@ var QuestionsSpotlight = new Vue({
 				id: 'stage_' + this.stages,
 				formulation: 'Nueva etapa',
 				container_class: 'bg-secondary text-white'
+			});
+		},
+		removeQuestion: function removeQuestion(element_id) {
+			this.questions = _.reject(this.questions, function (item) {
+				return item.id == element_id;
 			});
 		},
 		addOnboarding: function addOnboarding() {}

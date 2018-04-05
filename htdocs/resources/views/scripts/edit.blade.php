@@ -10,14 +10,15 @@
 						<selectize v-model="options" v-on:selectized="addQuestion"></selectize>
 					</div>
 					<div class="btn-group mb-5" role="group" aria-label="Elementos">
-						<button type="button" class="btn btn-secondary" v-on:click="addStage">Separación de etapa</button>
-						<button type="button" class="btn btn-secondary" v-on:click="addOnboarding">Preguntas de Onboarding</button>
+						<button type="button" class="btn btn-secondary" v-on:click="addStage">Añadir separación de etapa</button>
+						{{-- <button type="button" class="btn btn-secondary" v-on:click="addOnboarding">Preguntas de Onboarding</button> --}}
 					</div>
 					<draggable v-model="questions">
 						<transition-group>
 							<div :class="[ 'card', 'mb-3', element.container_class ? element.container_class : '' ]" v-for="element in questions" :key="element.id">
 								<div class="card-body">
 									<strong class="card-title">@{{ element.formulation }}</strong>
+									<button type="button" class="close" v-on:click="removeQuestion( element.id )"><span aria-hidden="true">&times;</span></button>
 								</div>
 							</div>
 						</transition-group>
