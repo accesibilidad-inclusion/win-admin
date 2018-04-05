@@ -32,34 +32,31 @@ const QuestionsSpotlight = new Vue({
 	el: '#questions-spotlight',
 	data: {
 		options: [],
-		questions: []
+		questions: [],
+		stages : 1,
 	},
 	methods: {
-		onSearch( search, loading ) {
-			loading( true );
-			this.search( loading, search, this );
-		},
-		selectedQuestion: function( val ) {
-			this.$children.forEach(element => {
-				if ( element.$el.className.indexOf('searchable') !== -1 ) {
-					element.$el.val = '';
-					element.$emit('focus');
-				}
-			});
+		addQuestion: function( val ) {
 			if ( val ) {
 				this.questions.push( val );
-				this.options = [];
 			}
 		},
-		search: _.debounce( (loading, search, vm) => {
-			axios.get('/api/v1/questions', {
-				params : {
-					'search' : search
-				}
-			}).then(function( response ){
-				vm.options = response.data;
-				loading( false );
+		addStage: function() {
+			this.stages++;
+			this.questions.push({
+				id: 'stage_'+ this.stages,
+				formulation: 'Nueva etapa',
+				container_class: 'bg-secondary text-white'
 			});
-		}, 350 )
+		},
+		addOnboarding: function() {
+
+		}
 	}
+});
+
+$(document).ready(function(){
+	$('form').on('submit', function( event ){
+		$('#script__order').val( JSON.stringify( QuestionsSpotlight.$data.questions ) );
+	});
 });

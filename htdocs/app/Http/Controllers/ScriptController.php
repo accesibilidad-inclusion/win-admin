@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Script;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 
 class ScriptController extends Controller
 {
@@ -57,7 +58,7 @@ class ScriptController extends Controller
      */
     public function edit(Script $script)
     {
-        return view('scripts.edit', $script);
+        return view('scripts.edit', ['script' => $script ]);
     }
 
     /**
@@ -69,7 +70,19 @@ class ScriptController extends Controller
      */
     public function update(Request $request, Script $script)
     {
-        //
+        $ordered = json_decode( $request->get('questions_order') );
+        $script  = [];
+        $stage   = 0;
+        foreach ( $ordered as $item ) {
+            if ( stripos( $item->id, 'stage' ) !== false ){
+                $stage++;
+                continue;
+            }
+            $script[ $stage ][] = $item->id;
+        }
+        $script->questions_order = $script;
+        $script->save();
+        return Redirect::route( 'scripts.edit', $script, 303 );
     }
 
     /**
