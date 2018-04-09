@@ -27,12 +27,12 @@ const axios = require('axios');
 // Vue.component('example-component', require('./components/ExampleComponent.vue'));
 //
 
-// questions-spotlig
+// questions-spotlight
 const QuestionsSpotlight = new Vue({
 	el: '#questions-spotlight',
 	data: {
 		options: [],
-		questions: [],
+		questions: Script.questions_order || [],
 		stages : 1,
 	},
 	methods: {

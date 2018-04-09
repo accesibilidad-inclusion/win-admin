@@ -1,5 +1,7 @@
 <?php
 
+use App\Script;
+use App\Question;
 use Illuminate\Database\Seeder;
 
 class AnswersTableSeeder extends Seeder
@@ -20,5 +22,19 @@ class AnswersTableSeeder extends Seeder
          * ---
          * aids_answer
          */
+        $script = Script::find( 1 );
+        foreach ( $script->questions_order as $question ) {
+            if ( ! $question instanceof Question ) {
+                continue;
+            }
+            // @todo: agregar aleatoriamente especificación en las que lo solicitan
+            // @todo: cuando la opción es "sí con ayuda", añadir ayudas aleatoriamente
+            DB::table('answers')->insert([
+                'subject_id' => 1,
+                'survey_id' => 1,
+                'option_id' => $question->options->random()->id,
+                'response_time' => mt_rand(5, 60)
+            ]);
+        }
     }
 }

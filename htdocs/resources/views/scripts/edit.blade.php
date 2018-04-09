@@ -40,3 +40,9 @@
 		</div>
 	</div>
 @endsection
+
+@section('footer_scripts')
+<script type="text/javascript">
+var Script = @json( $script );
+</script>
+@endsection

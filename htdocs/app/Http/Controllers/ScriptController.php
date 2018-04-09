@@ -70,17 +70,17 @@ class ScriptController extends Controller
      */
     public function update(Request $request, Script $script)
     {
-        $ordered = json_decode( $request->get('questions_order') );
-        $script  = [];
+        $ordered         = json_decode( $request->get('questions_order') );
+        $questions_order = [];
         $stage   = 0;
         foreach ( $ordered as $item ) {
             if ( stripos( $item->id, 'stage' ) !== false ){
                 $stage++;
                 continue;
             }
-            $script[ $stage ][] = $item->id;
+            $questions_order[ $stage ][] = $item->id;
         }
-        $script->questions_order = $script;
+        $script->questions_order = $questions_order;
         $script->save();
         return Redirect::route( 'scripts.edit', $script, 303 );
     }
