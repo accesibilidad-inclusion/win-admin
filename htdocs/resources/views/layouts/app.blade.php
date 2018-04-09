@@ -24,7 +24,6 @@
 			<div class="collapse navbar-collapse" id="navbarsExampleDefault">
 				<ul class="navbar-nav mr-auto">
 					<li class="nav-item"><a href="{{ route('login') }}" class="nav-link">Login</a></li>
-					<li class="nav-item"><a href="{{ route('register') }}" class="nav-link">Registrarse</a></li>
 				</ul>
 			</ul>
 			@else
