@@ -26,7 +26,11 @@ class DatabaseSeeder extends Seeder
             SubjectsTableSeeder::class,
 
             // Guión predeterminado
-            ScriptsTableSeeder::class
+            ScriptsTableSeeder::class,
+
+            // Respuestas de prueba
+            SurveysTableSeeder::class,
+            AnswersTableSeeder::class
 		]);
     }
 }

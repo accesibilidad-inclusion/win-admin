@@ -1,6 +1,7 @@
 <?php
 
 use App\Script;
+use App\Assistance;
 use Illuminate\Http\Request;
 
 /*
@@ -38,7 +39,8 @@ Route::prefix('v1')->group(function() {
 		$questions = App\Question::with(['category'])->get(5);
 		return $questions->toJson();
     });
-    Route::get('/scripts/{id}', function( $id ){
+    Route::get('/scripts/{id}', function( Request $request, Response $response, $id ){
+
         // $script = Script::find( $id );
 		// return $script->toJson();
 		$response = [
@@ -63,6 +65,37 @@ Route::prefix('v1')->group(function() {
 				]
 			]
 		];
-		return json_encode( $response );
-    });
+		return response( json_encode( $response ) )
+			->header( 'Content-Type', 'application/json' );
+	});
+	Route::get('/assistances', function(){
+		$assistances = Assistance::all();
+		return $assistances->toJson();
+	});
+	Route::get('/specifications', function(){
+		$specs = [
+			[
+				'id' => 1,
+				'label' => 'Familia'
+			],
+			[
+				'id' => 2,
+				'label' => 'Amigos'
+			],
+			[
+				'id' => 3,
+				'label' => 'Profesional'
+			],
+			[
+				'id' => 4,
+				'label' => 'Tecnología'
+			],
+			[
+				'id' => 5,
+				'label' => 'Otro'
+			]
+		];
+		return response( json_encode( $specs ) )
+			->header('Content-Type', 'application/json');
+	});
 });

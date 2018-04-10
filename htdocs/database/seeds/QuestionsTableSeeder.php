@@ -53,6 +53,9 @@ class QuestionsTableSeeder extends Seeder
 			$question = new Question;
 			$question->formulation = $row['formulation'];
 			$question->needs_specification = $row['needs_specification'] == 'Sí';
+			if ( $question->needs_specification ) {
+				$question->specification = 'Dónde '. strtolower( $row['formulation'][0] ) . substr( $row['formulation'], 1 );
+			}
 			$question->order = $idx;
 
 			$category = $categories->first( function( $category ) use ( $row ) {
@@ -79,11 +82,13 @@ class QuestionsTableSeeder extends Seeder
 				$options[] = [
 					'type' => 'yes',
 					'order' => $opt_i,
+					'value' => 6 - ( $i - 1 ),
 					'label' => 'Sí, ' . $row["option_yes_{$i}"]
 				];
 				$options[] = [
 					'type' => 'no',
 					'order' => $opt_i,
+					'value' => 3 - ( $i - 1 ),
 					'label' => 'No, ' . $row["option_no_{$i}"]
 				];
 				$opt_i++;

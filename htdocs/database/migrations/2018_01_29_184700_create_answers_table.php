@@ -31,7 +31,7 @@ class CreateAnswersTable extends Migration
             // sólo puede haber 1 respuesta de 1 sujeto a 1 alternativa en 1 aplicación
 			$table->unique(['subject_id', 'survey_id', 'option_id']);
 
-            $table->enum('specification', ['home', 'outside', 'always']);
+            $table->enum('specification', ['home', 'outside', 'both'])->nullable();
 
             // tiempo de respuesta, en segundos
 			$table->unsignedInteger('response_time')->nullable();

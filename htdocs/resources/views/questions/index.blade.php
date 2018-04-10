@@ -5,7 +5,7 @@
 		@foreach ( $questions as $question )
 			<div class="card mb-3">
 				<div class="card-body">
-					<p class="h5 card-title">{{ $question->formulation }}</p>
+					<p class="h5 card-title">{{ $question->id }}. {{ $question->formulation }}</p>
 					@if ( $question->category )
 					<p><strong>Categoría:</strong> {{ $question->category->label }} </p>
 					@endif
