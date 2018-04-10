@@ -9,6 +9,12 @@ class Script extends Model
 	protected $casts = [
 		'questions_order' => 'array'
 	];
+	protected $visible = [
+		'id',
+		'name',
+		'questions_order',
+		'updated_at'
+	];
 	public function getQuestionsOrderAttribute( $ordered )
 	{
 		$all_questions = [];
@@ -18,7 +24,7 @@ class Script extends Model
 				$all_questions[] = $question;
 			}
 		}
-		$questions = Question::findMany( $all_questions );
+		$questions = Question::findMany( $all_questions )->load('options');
 		$stage_id = 2;
 		$ordered_questions = [];
 		$i = 0;
@@ -37,5 +43,30 @@ class Script extends Model
 			++$stage_id;
 		}
 		return $ordered_questions;
+	}
+	public function getStagesAttribute( )
+	{
+		$questions_order = json_decode( $this->attributes['questions_order'] );
+		$question_ids = [];
+		foreach ( $questions_order as $key => $val ) {
+			$questions_order[ $key ] = array_values( (array) $val );
+			$question_ids = array_merge( $question_ids, $questions_order[ $key ] );
+		}
+		$questions = Question::findMany( $question_ids )->load('options');
+		$stages = [];
+		$i = 0;
+		foreach ( $questions_order as $stage ) {
+			$stages[] = [
+				'name' => 'Etapa '. ($i+1),
+				'id'   => ( $i + 1 ),
+				'description' => '',
+				'questions' => $questions->filter( function( $item ) use ( $stage ){
+					return in_array( $item->id, $stage );
+				})
+			];
+		}
+		return [
+			'questionnaire' => $stages
+		];
 	}
 }

@@ -39,33 +39,34 @@ Route::prefix('v1')->group(function() {
 		$questions = App\Question::with(['category'])->get(5);
 		return $questions->toJson();
     });
-    Route::get('/scripts/{id}', function( Request $request, Response $response, $id ){
+    Route::get('/scripts/{id}', function( Request $request, Response $response, int $id ){
 
+		$script = Script::findOrFail( $id );
         // $script = Script::find( $id );
 		// return $script->toJson();
-		$response = [
-			'onboarding' => [
-				[
-					'slug' => 'bienvenida',
-					'audio' => [
-						'url' => 'https://admin.apoyos.win/audio/33428349283.mp3'
-					]
-				]
-			],
-			'questionnaire' => [
-				[
-					'name' => 'Etapa 1',
-					'description' => '',
-					'questions' => App\Question::with(['options'])->take( 11 )->get()
-				],
-				[
-					'name' => 'Etapa 2',
-					'description' => '',
-					'questions' => App\Question::with(['options'])->take( 11 )->offset( 11 )->get()
-				]
-			]
-		];
-		return response( json_encode( $response ) )
+		// $response = [
+		// 	'onboarding' => [
+		// 		[
+		// 			'slug' => 'bienvenida',
+		// 			'audio' => [
+		// 				'url' => 'https://admin.apoyos.win/audio/33428349283.mp3'
+		// 			]
+		// 		]
+		// 	],
+		// 	'questionnaire' => [
+		// 		[
+		// 			'name' => 'Etapa 1',
+		// 			'description' => '',
+		// 			'questions' => App\Question::with(['options'])->take( 11 )->get()
+		// 		],
+		// 		[
+		// 			'name' => 'Etapa 2',
+		// 			'description' => '',
+		// 			'questions' => App\Question::with(['options'])->take( 11 )->offset( 11 )->get()
+		// 		]
+		// 	]
+		// ];
+		return response( json_encode( $script->stages ) )
 			->header( 'Content-Type', 'application/json' );
 	});
 	Route::get('/assistances', function(){
