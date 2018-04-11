@@ -1,6 +1,8 @@
 <?php
 
 use App\Script;
+use App\Survey;
+use App\Subject;
 use App\Assistance;
 use Illuminate\Http\Request;
 
@@ -42,6 +44,7 @@ Route::prefix('v1')->group(function() {
     Route::get('/scripts/{id}', function( Request $request, Response $response, int $id ){
 
 		$script = Script::findOrFail( $id );
+
         // $script = Script::find( $id );
 		// return $script->toJson();
 		// $response = [
@@ -98,5 +101,29 @@ Route::prefix('v1')->group(function() {
 		];
 		return response( json_encode( $specs ) )
 			->header('Content-Type', 'application/json');
+	});
+	Route::get('/surveys/{id}', function( Request $request, int $id ){
+		$survey = Survey::where([
+			'id' => $id,
+			'hash' => $request->get('hash')
+		])->firstOrFail();
+		return $survey->toJson();
+	});
+	Route::post('/surveys', function( Request $request ){
+		$survey = Survey::create([
+			'subject_id' => $request->get('subject_id'),
+			'script_id'  => $request->get('script_id') ?? 1
+		]);
+		return $survey->toJson();
+	});
+	Route::post('/answer', function( Request $request ){
+		// question_id
+		// subject_id
+		// survey_id
+		// hash
+		// option_id
+		// response_time
+		// specification: [ home, outside ]
+		// aids: [ id, id, id ]
 	});
 });

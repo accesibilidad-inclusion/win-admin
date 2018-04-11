@@ -62,11 +62,9 @@ class Script extends Model
 				'description' => '',
 				'questions' => $questions->filter( function( $item ) use ( $stage ){
 					return in_array( $item->id, $stage );
-				})
+				})->values()
 			];
 		}
-		return [
-			'questionnaire' => $stages
-		];
+		return $stages;
 	}
 }

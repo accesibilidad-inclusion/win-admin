@@ -1,3 +1,51 @@
+# Inicialización y autenticación del usuario
+
+* usuario abre aplicación cliente
+* tiene hash de survey? → `GET /survey/{id}/?hash={$bar}` (ok)
+  - no: pasa a onboarding
+  - si: continúa cuestionario
+* tiene id de evento? → `GET /event/{$event_id}` (pendiente)
+  - no: pasa por onboarding
+  - si: onboarding resumido
+* finaliza onboarding: cliente envía datos de usuario → `POST /user` (pendiente)
+  - admin responde con id de usuario
+* cliente solicita survey para user_id y script_id → `POST /survey` (ok)
+  - admin responde con survey (incluye hash)
+* usuario responde cuestionario → `POST /answer` (pendiente)
+  - admin responde si es válida
+* usuario finaliza cuestionario → `POST /survey/complete` (pendiente)
+  - admin responde con datos para gráfico
+
+---
+
+# SUBJECT
+
+# SURVEY
+
+{
+  "hash: "",
+  "assistances": [
+
+  ],
+  "specifications": [
+
+  ],
+  "onboarding": [
+
+  ],
+  "script" : [
+    {
+      "id": 1,
+      "name": "Etapa 1",
+      "description": "Lorem ipsum",
+      "questions": [
+        { Question }
+      ]
+    }
+  ]
+}
+
+
 # Preguntas sobre estructura de datos y reglas de negocio
 
 ---
