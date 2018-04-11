@@ -10,3 +10,4 @@ htdocs/.env.php
 htdocs/.env
 
 .vscode/
+htdocs/public/docs.html

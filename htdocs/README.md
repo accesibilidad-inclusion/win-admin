@@ -7,7 +7,7 @@
 * tiene id de evento? → `GET /event/{$event_id}` (pendiente)
   - no: pasa por onboarding
   - si: onboarding resumido
-* finaliza onboarding: cliente envía datos de usuario → `POST /user` (pendiente)
+* finaliza onboarding: cliente envía datos de usuario → `POST /subject` (pendiente)
   - admin responde con id de usuario
 * cliente solicita survey para user_id y script_id → `POST /survey` (ok)
   - admin responde con survey (incluye hash)

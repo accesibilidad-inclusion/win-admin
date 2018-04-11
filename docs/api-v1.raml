@@ -1,0 +1,137 @@
+#%RAML 1.0
+title: Win API
+version: 1.0.0
+baseUri: https://admin.apoyos.win/api/v1/
+protocols: HTTPS
+types:
+    Question:
+        type: object
+        properties:
+            id: integer
+            formulation: string
+            needs_specification: boolean
+            specification: string
+            dimension_id: integer
+            category_id: integer
+            options: Option[]
+    Option:
+        type: object
+        properties:
+            id: integer
+            type:
+                enum: [ 'yes', 'no' ]
+            label: string
+            order: integer
+            value: integer
+            question_id: integer
+    Aid:
+        type: object
+        properties:
+            id: integer
+            label: string
+    Specification:
+        type: object
+        properties:
+            id: string
+            label: string
+    Survey:
+        type: object
+        properties:
+            id: integer
+            subject_id: integer
+            event_id: integer
+            script_id: integer
+            hash: string
+            is_completed: boolean
+            last_answer_at?: datetime
+            deleted_at?: datetime
+            created_at: datetime
+            updated_at: datetime
+            onboarding:
+                type: array
+            questionnaire:
+                type: object
+                properties:
+                    name: string
+                    id: integer
+                    description: integer
+                    questions: Question[]
+            aids: Aid[]
+            specifications: Specification[]
+/answer:
+    displayName: Respuestas
+    post:
+        description: Enviar la respuesta a una pregunta
+        body:
+            multipart/form-data:
+            application/json:
+                properties:
+                    question_id:
+                        required: true
+                        description: ID de la pregunta
+                        type: integer
+                    subject_id:
+                        required: true
+                        type: integer
+                        description: ID del sujeto
+                    survey_id:
+                        required: true
+                        type: integer
+                        description: ID de la aplicación
+                    hash:
+                        required: true
+                        type: string
+                        description: Hash de la aplicación (survey)
+                    option_id:
+                        required: true
+                        type: integer
+                        description: ID de la opción seleccionada
+                    response_time:
+                        required: true
+                        type: integer
+                        description: Tiempo de respuesta del usuario, en segundo
+/event:
+    displayName: Eventos de aplicación
+/survey:
+    displayName: Aplicación de la encuesta
+    /{id}:
+        get:
+            description: Obtener información de una aplicación
+            uriParameters:
+                id:
+                    description: ID de la aplicación
+                    type: integer
+                    required: true
+            queryParameters:
+                hash:
+                    description: Idenitificador de la aplicación (survey)
+                    type: string
+                    required: true
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Survey
+    post:
+        description: Crear una nueva aplicación
+        body:
+            multipart/form-data:
+            application/json:
+                properties:
+                    subject_id:
+                        type: integer
+                        required: true
+                    script_id:
+                        type: integer
+                        required: false
+                        default: 1
+        responses:
+            200:
+                body:
+                    application/json:
+                        type: Survey
+/subject:
+    displayName: Usuario de la encuesta
+    post:
+        description: |
+            Crear un usuario
