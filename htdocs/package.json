@@ -29,5 +29,7 @@
         "vuedraggable": "^2.16.0",
         "webpack-notifier": "^1.5.0"
     },
-    "dependencies": {}
+    "dependencies": {
+        "raml2html": "^7.1.0"
+    }
 }
