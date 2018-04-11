@@ -107,14 +107,16 @@ Route::prefix('v1')->group(function() {
 			'id' => $id,
 			'hash' => $request->get('hash')
 		])->firstOrFail();
-		return $survey->toJson();
+		return response( $survey->toJson() )
+		->header('Content-Type', 'application/json');
 	});
 	Route::post('/surveys', function( Request $request ){
 		$survey = Survey::create([
 			'subject_id' => $request->get('subject_id'),
 			'script_id'  => $request->get('script_id') ?? 1
 		]);
-		return $survey->toJson();
+		return response( $survey->toJson() )
+			->header('Content-Type', 'application/json');
 	});
 	Route::post('/answer', function( Request $request ){
 		// question_id
