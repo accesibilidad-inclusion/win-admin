@@ -11,7 +11,7 @@
   - admin responde con id de usuario
 * cliente solicita survey para user_id y script_id → `POST /survey` (ok)
   - admin responde con survey (incluye hash)
-* usuario responde cuestionario → `POST /answer` (pendiente)
+* usuario responde cuestionario → `POST /answer` (pendiente--90%)
   - admin responde si es válida
 * usuario finaliza cuestionario → `POST /survey/complete` (pendiente)
   - admin responde con datos para gráfico

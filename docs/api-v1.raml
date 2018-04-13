@@ -105,7 +105,7 @@ types:
             deleted_at?: string
             created_at: string
             updated_at: string
-/answer:
+/answers:
     displayName: Respuestas
     post:
         description: Enviar la respuesta a una pregunta
@@ -137,6 +137,15 @@ types:
                         required: true
                         type: integer
                         description: Tiempo de respuesta del usuario, en segundo
+                    aids:
+                        required: false
+                        type: array
+                        properties: integer
+                        description: IDs de "ayudas" cuando la respuesta es "sí, con apoyo"
+                    specification:
+                        required: false
+                        enum: ['home', 'outside', 'both']
+                        description: Especificación de lugar para la pregunta
 /event:
     displayName: Eventos de aplicación
     /{hash}:
