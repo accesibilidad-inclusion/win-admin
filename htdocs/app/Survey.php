@@ -19,6 +19,7 @@ class Survey extends Model
     ];
     protected $casts = [
         'is_completed' => 'boolean',
+        'subject_id' => 'integer'
     ];
     protected $fillable = [
         'subject_id',

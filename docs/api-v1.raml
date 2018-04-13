@@ -3,6 +3,22 @@ title: Win API
 version: 1.0.0
 baseUri: https://admin.apoyos.win/api/v1/
 protocols: HTTPS
+traits:
+    standardErrors:
+        responses:
+            404:
+                body:
+                    application/json:
+                        type: string
+                        example: |
+                            'Not Found'
+            500:
+                body:
+                    application/json:
+                        type: object
+                        properties:
+                            exception: string
+                            message: string
 types:
     Question:
         type: object
@@ -58,6 +74,37 @@ types:
                     questions: Question[]
             aids: Aid[]
             specifications: Specification[]
+    Event:
+        type: object
+        properties:
+            id: integer
+            label: string
+            starts_at: datetime
+            ends_at: datetime
+            status:
+                enum: ['active', 'inactive']
+            hash: string
+            deleted_at?: datetime
+            created_by: integer
+            created_at: datetime
+            updated_at: datetime
+    Subject:
+        type: object
+        properties:
+            id: integer
+            personal_id: string
+            given_name: string
+            family_name: string
+            sex:
+                enum: ['female', 'male', 'other']
+            consent_at: datetime
+            works: boolean
+            studies: boolean
+            studies_at: string
+            last_connection_at: string
+            deleted_at?: string
+            created_at: string
+            updated_at: string
 /answer:
     displayName: Respuestas
     post:
@@ -92,11 +139,26 @@ types:
                         description: Tiempo de respuesta del usuario, en segundo
 /event:
     displayName: Eventos de aplicación
+    /{hash}:
+        get:
+            description: Obtener información sobre un evento de aplicación
+            is: [ standardErrors ]
+            uriParameters:
+                hash:
+                    description: Hash del evento
+                    type: string
+                    required: true
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Event
 /survey:
     displayName: Aplicación de la encuesta
     /{id}:
         get:
             description: Obtener información de una aplicación
+            is: [ standardErrors ]
             uriParameters:
                 id:
                     description: ID de la aplicación
@@ -133,5 +195,52 @@ types:
 /subject:
     displayName: Usuario de la encuesta
     post:
-        description: |
-            Crear un usuario
+        description: Crear un usuario
+        body:
+            multipart/form-data:
+            application/json:
+                properties:
+                    personal_id:
+                        description: RUT o DNI
+                        type: string
+                        required: false
+                    given_name:
+                        description: Primer nombre
+                        type: string
+                        required: false
+                    family_name:
+                        description: Apellido
+                        type: string
+                        required: false
+                    sex?:
+                        description: Sexo del sujeto
+                        enum: ['female', 'male', 'other']
+                    consent_at:
+                        description: Debe indicar la fecha en que el sujeto dio su consentimiento para recopilar sus datos
+                        type: datetime
+                        required: true
+                    works?: boolean
+                    studies?: boolean
+                    studies_at?: string
+        responses:
+            201:
+                description: Sujeto creado correctamente
+                body:
+                    application/json:
+                        type: Subject
+            422:
+                description: Error de validación al intentar creación de sujeto
+                body:
+                    application/json:
+                        example: |
+                            {
+                                "errors": {
+                                    "sex": [
+                                        "The selected sex is invalid"
+                                    ],
+                                    "studies": [
+                                        "The studies field must be true or false"
+                                    ]
+                                },
+                                "message": "The given data was invalid"
+                            }

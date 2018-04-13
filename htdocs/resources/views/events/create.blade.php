@@ -3,7 +3,7 @@
 @section('content')
 	<div class="container">
 		<div class="col-sm-10">
-			<form action="{{ route('events.store') }}" class="form" novalidate="novalidate" method="POST">
+			<form action="{{ $event->exists ? route('events.update', $event ) : route('events.store') }}" class="form" novalidate="novalidate" method="POST">
 				<div class="form-group">
 					<label for="event__label">Nombre del evento <small class="text-muted">(opcional)</small></label>
 					<input name="label" id="event__label" type="text" class="form-control" value="{{ old('label', $event->label ) }}">
@@ -50,7 +50,7 @@
 					</div>
 					<div class="form-check form-check-inline">
 						<label for="event__status--inactive" class="form-check-label">
-							<input type="radio" class="form-check-input" id="event__status--inactive" name="status" value="inactive">
+							<input type="radio" class="form-check-input" id="event__status--inactive" name="status" value="inactive"{{ ( ! $event->exists || old('status', $event->status ) == 'inactive' ) ? ' checked="checked"' : '' }}>
 							Cerrado
 						</label>
 					</div>
@@ -60,6 +60,9 @@
 						{{ $event->exists ? 'Actualizar' : 'Crear' }}
 					</button>
 				</div>
+				@if ( $event->exists )
+					{{ method_field('PUT') }}
+				@endif
 				{{ csrf_field() }}
 			</form>
 		</div>

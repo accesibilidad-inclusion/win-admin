@@ -40,10 +40,11 @@ class AnswersTableSeeder extends Seeder
             // @todo: agregar aleatoriamente especificación en las que lo solicitan
             // @todo: cuando la opción es "sí con ayuda", añadir ayudas aleatoriamente
             DB::table('answers')->insert([
-                'subject_id' => 1,
-                'survey_id' => 1,
-                'option_id' => $option->id,
-                'response_time' => mt_rand(5, 60)
+                'question_id'   => $question->id,
+                'subject_id'    => 1,
+                'survey_id'     => 1,
+                'option_id'     => $option->id,
+                'response_time' =>  mt_rand(5, 60)
             ]);
             if ( $option->type == 'yes' && $option->order == 3 ) {
 

@@ -4,10 +4,10 @@
 * tiene hash de survey? → `GET /survey/{id}/?hash={$bar}` (ok)
   - no: pasa a onboarding
   - si: continúa cuestionario
-* tiene id de evento? → `GET /event/{$event_id}` (pendiente)
+* tiene id de evento? → `GET /event/{$event_id}` (ok)
   - no: pasa por onboarding
   - si: onboarding resumido
-* finaliza onboarding: cliente envía datos de usuario → `POST /subject` (pendiente)
+* finaliza onboarding: cliente envía datos de usuario → `POST /subject` (ok)
   - admin responde con id de usuario
 * cliente solicita survey para user_id y script_id → `POST /survey` (ok)
   - admin responde con survey (incluye hash)

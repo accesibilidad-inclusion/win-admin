@@ -1,10 +1,14 @@
 <?php
 
+use App\Event;
 use App\Script;
 use App\Survey;
 use App\Subject;
 use App\Assistance;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use App\Http\Requests\StoreSubject;
+use App\Answer;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,99 +37,100 @@ Route::prefix('v1')->group(function() {
 		}
 		return $questions->toJson();
 	});
-	Route::get('/questions/{id}', function($id){
-		$question = App\Question::with(['category', 'dimension', 'options', 'assistances'])->find($id);
-		return $question->toJson();
-	});
-	Route::get('/questions/search', function(){
-		$questions = App\Question::with(['category'])->get(5);
-		return $questions->toJson();
-    });
-    Route::get('/scripts/{id}', function( Request $request, Response $response, int $id ){
 
-		$script = Script::findOrFail( $id );
-
-        // $script = Script::find( $id );
-		// return $script->toJson();
-		// $response = [
-		// 	'onboarding' => [
-		// 		[
-		// 			'slug' => 'bienvenida',
-		// 			'audio' => [
-		// 				'url' => 'https://admin.apoyos.win/audio/33428349283.mp3'
-		// 			]
-		// 		]
-		// 	],
-		// 	'questionnaire' => [
-		// 		[
-		// 			'name' => 'Etapa 1',
-		// 			'description' => '',
-		// 			'questions' => App\Question::with(['options'])->take( 11 )->get()
-		// 		],
-		// 		[
-		// 			'name' => 'Etapa 2',
-		// 			'description' => '',
-		// 			'questions' => App\Question::with(['options'])->take( 11 )->offset( 11 )->get()
-		// 		]
-		// 	]
-		// ];
-		return response( json_encode( $script->stages ) )
-			->header( 'Content-Type', 'application/json' );
-	});
-	Route::get('/assistances', function(){
-		$assistances = Assistance::all();
-		return $assistances->toJson();
-	});
-	Route::get('/specifications', function(){
-		$specs = [
-			[
-				'id' => 1,
-				'label' => 'Familia'
-			],
-			[
-				'id' => 2,
-				'label' => 'Amigos'
-			],
-			[
-				'id' => 3,
-				'label' => 'Profesional'
-			],
-			[
-				'id' => 4,
-				'label' => 'Tecnología'
-			],
-			[
-				'id' => 5,
-				'label' => 'Otro'
-			]
-		];
-		return response( json_encode( $specs ) )
-			->header('Content-Type', 'application/json');
-	});
 	Route::get('/surveys/{id}', function( Request $request, int $id ){
 		$survey = Survey::where([
 			'id' => $id,
 			'hash' => $request->get('hash')
 		])->firstOrFail();
-		return response( $survey->toJson() )
-		->header('Content-Type', 'application/json');
+		return response( $survey->toJson() );
 	});
 	Route::post('/surveys', function( Request $request ){
 		$survey = Survey::create([
 			'subject_id' => $request->get('subject_id'),
 			'script_id'  => $request->get('script_id') ?? 1
 		]);
-		return response( $survey->toJson() )
-			->header('Content-Type', 'application/json');
+		return response( $survey->toJson() )->setStatusCode( 201 );
 	});
-	Route::post('/answer', function( Request $request ){
-		// question_id
-		// subject_id
-		// survey_id
-		// hash
-		// option_id
-		// response_time
-		// specification: [ home, outside ]
-		// aids: [ id, id, id ]
+	Route::get('/events/{hash}', function( Request $request ){
+		$event = Event::where([
+			'hash'   => $request->hash,
+			'status' => 'active'
+		])->firstOrFail();
+		return response( $event->toJson() );
+	});
+	Route::post('/answers', function( Request $request ){
+		$validate = $request->validate([
+			'question_id'   => 'required|integer|exists:questions,id',
+			'subject_id'    => 'required|integer|exists:subjects,id',
+			'survey_id'     => 'required|integer|exists:surveys,id',
+			'hash'          => 'required|exists:surveys,hash',
+			'option_id'     => 'required|integer|exists:options,id',
+			'response_time' => 'required|integer',
+			'specification' => 'string|in:home,outside',
+			'aids'          => 'array|integer|exists:aids,id'
+		]);
+		$answer_data = [];
+		foreach ( [
+			'question_id',
+			'subject_id',
+			'survey_id',
+			'option_id',
+			'response_time'
+		] as $key ) {
+			$answer_data[ $key ] = $request->get( $key );
+		}
+		$answer = Answer::where([
+			'subject_id'  => $answer_data['subject_id'],
+			'survey_id'   => $answer_data['survey_id'],
+			'question_id' => $answer_data['question_id']
+		])->get()->first();
+
+		if ( $answer ) {
+			$answer->update( $answer_data );
+		} else {
+			$answer = Answer::create( $answer_data );
+		}
+		$answer->save();
+
+		// @todo añadir "aids"
+
+		return response( $answer->toJson( ) )->setStatusCode( $answer->wasRecentlyCreated ? 201 : 200 );
+	});
+	Route::post('/subjects', function( Request $request ){
+		$validate = $request->validate([
+            'sex' => [
+                'required',
+                Rule::in( array_keys( Subject::getSexes() ) )
+            ],
+            'given_name'         => 'required|string|max:191',
+            'family_name'        => 'required|string|max:191',
+            'works'              => 'bool',
+            'studies'            => 'bool',
+            'studies_at'         => 'nullable|string|max:191',
+            'personal_id'        => 'nullable|string|max:32',
+            'consent_at'         => 'date_format:Y-m-d H:i:s',
+            'last_connection_at' => 'date_format:Y-m-d H:i:s',
+		]);
+		$subject = new Subject;
+		foreach ( $request->all() as $key => $val ) {
+			switch ( $key ) {
+				case 'personal_id':
+				case 'given_name':
+				case 'family_name':
+				case 'studies_at':
+					$subject->{$key} = filter_var( trim( $val ), FILTER_SANITIZE_STRING );
+					break;
+				case 'sex':
+				case 'works':
+				case 'studies':
+					$subject->{$key} = $val;
+					break;
+
+			}
+		}
+		$subject->save();
+		return response( $subject->toJson() )
+			->setStatusCode( 201 );
 	});
 });

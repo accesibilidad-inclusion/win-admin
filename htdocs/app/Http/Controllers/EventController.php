@@ -106,7 +106,22 @@ class EventController extends Controller
      */
     public function update(Request $request, Event $event)
     {
-        //
+        $event->label = $request->input('label');
+        if ( ! empty( $request->input('starts_at') ) ) {
+            $starts_at = new \DateTime( $request->input('starts_at') );
+            $event->starts_at = $starts_at;
+        } else {
+            $event->starts_at = null;
+        }
+        if ( ! empty( $request->input('ends_at') ) ) {
+            $ends_at = new \DateTime( $request->input('ends_at') );
+            $event->ends_at = $ends_at;
+        } else {
+            $event->ends_at = null;
+        }
+        $event->status = $request->input('status') ?? 'active';
+        $event->save();
+        return Redirect::route('events.edit', $event, 303);
     }
 
     /**

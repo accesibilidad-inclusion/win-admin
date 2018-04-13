@@ -28,8 +28,12 @@ class CreateAnswersTable extends Migration
             $table->unsignedInteger('option_id');
             $table->foreign('option_id')->references('id')->on('options');
 
+            $table->unsignedInteger('question_id');
+            $table->foreign('question_id')->references('id')->on('options');
+
             // sólo puede haber 1 respuesta de 1 sujeto a 1 alternativa en 1 aplicación
-			$table->unique(['subject_id', 'survey_id', 'option_id']);
+            // pueden haber más respuestas en aplicaciones (survey_id) distintas
+			$table->unique(['subject_id', 'survey_id', 'question_id']);
 
             $table->enum('specification', ['home', 'outside', 'both'])->nullable();
 

@@ -32,6 +32,15 @@ class Subject extends Model
     {
         $this->attributes['given_name'] = filter_var( $val, FILTER_SANITIZE_STRING );
     }
+    public function setSexAttribute( $val )
+    {
+        $values = static::getSexes();
+        if ( \array_key_exists( $val, static::getSexes() ) ) {
+            return $val;
+        } else {
+            throw new \InvalidArgumentException("The value {$val} it's not valid");
+        }
+    }
     public function setFamilyNameAttribute( $val )
     {
         $this->attributes['family_name'] = filter_var( $val, FILTER_SANITIZE_STRING );
