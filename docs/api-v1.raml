@@ -20,6 +20,19 @@ traits:
                             exception: string
                             message: string
 types:
+    Answer:
+        type: object
+        properties:
+            id: integer
+            created_at: datetime
+            option_id: integer
+            question_id: integer
+            response_time: integer
+            specification: boolean
+            subject_id: integer
+            survey_id: integer
+            updated_at: datetime
+            aids: Aid[]
     Question:
         type: object
         properties:
@@ -140,12 +153,25 @@ types:
                     aids:
                         required: false
                         type: array
-                        properties: integer
-                        description: IDs de "ayudas" cuando la respuesta es "sí, con apoyo"
+                        items: integer
+                        description: IDs de "ayudas" (aids) cuando la respuesta es "sí, con apoyo"
                     specification:
                         required: false
-                        enum: ['home', 'outside', 'both']
-                        description: Especificación de lugar para la pregunta
+                        type: array
+                        items:
+                            enum: ['home', 'outside']
+                        description: Especificación de lugar para la pregunta. Valores permitidos: 'home', 'outside'
+        responses:
+            201:
+                description: Se ha añadido una nueva respuesta del sujeto
+                body:
+                    application/json:
+                        type: Answer
+            200:
+                description: Se ha editado una respuesta del sujeto
+                body:
+                    application/json:
+                        type: Answer
 /event:
     displayName: Eventos de aplicación
     /{hash}:

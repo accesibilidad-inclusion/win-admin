@@ -61,25 +61,34 @@ Route::prefix('v1')->group(function() {
 	});
 	Route::post('/answers', function( Request $request ){
 		$validate = $request->validate([
-			'question_id'   => 'required|integer|exists:questions,id',
-			'subject_id'    => 'required|integer|exists:subjects,id',
-			'survey_id'     => 'required|integer|exists:surveys,id',
-			'hash'          => 'required|exists:surveys,hash',
-			'option_id'     => 'required|integer|exists:options,id',
-			'response_time' => 'required|integer',
-			'specification' => 'string|in:home,outside',
-			'aids'          => 'array|integer|exists:aids,id'
+			'question_id'     => 'required|integer|exists:questions,id',
+			'subject_id'      => 'required|integer|exists:subjects,id',
+			'survey_id'       => 'required|integer|exists:surveys,id',
+			'hash'            => 'required|exists:surveys,hash',
+			'option_id'       => 'required|integer|exists:options,id',
+			'response_time'   => 'required|integer',
+			'specification.*' => 'string|in:home,outside',
+			'aids.*'          => 'integer|exists:aids,id'
 		]);
+
+		// verificar cumplimiento de reglas de negocio:
+		// - el hash debe coincidir con el survey_id → si no, 403
+		// - el option_id debe estar asociado al question_id → si no, 422
+		// - el question_id debe ser parte del survey → si no, 422
+		// - sólo debe tener specificacion en caso de que la pregunta lo requiera → si no, 422
+
 		$answer_data = [];
 		foreach ( [
 			'question_id',
 			'subject_id',
 			'survey_id',
 			'option_id',
-			'response_time'
+			'response_time',
+			'specification'
 		] as $key ) {
 			$answer_data[ $key ] = $request->get( $key );
 		}
+
 		$answer = Answer::where([
 			'subject_id'  => $answer_data['subject_id'],
 			'survey_id'   => $answer_data['survey_id'],
@@ -91,9 +100,12 @@ Route::prefix('v1')->group(function() {
 		} else {
 			$answer = Answer::create( $answer_data );
 		}
+
 		$answer->save();
 
 		// @todo añadir "aids"
+		$answer->aids()->sync( $request->get('aids') );
+		$answer->load('aids');
 
 		return response( $answer->toJson( ) )->setStatusCode( $answer->wasRecentlyCreated ? 201 : 200 );
 	});

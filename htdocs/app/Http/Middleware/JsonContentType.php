@@ -20,7 +20,8 @@ class JsonContentType
         $response->header('Content-Type', 'application/json');
         switch ( $response->getStatusCode() ) {
             case 404:
-                $response->setContent( $this->getStatusText( $response->getStatusCode() ) );
+                $status_text = $this->getStatusText( $response->getStatusCode() );
+                $response->setContent( json_encode( $status_text ) );
                 break;
             case 500:
                 $exception = json_decode( $response->getContent() );

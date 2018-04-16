@@ -57,10 +57,10 @@ class Script extends Model
 		$i = 0;
 		foreach ( $questions_order as $stage ) {
 			$stages[] = [
-				'name' => 'Etapa '. ($i+1),
-				'id'   => ( $i + 1 ),
-				'description' => '',
-				'questions' => $questions->filter( function( $item ) use ( $stage ){
+				'name'        => 'Etapa '. ($i+1),
+				'id'          => ( $i + 1 ),
+				'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Hic, iure?',
+				'questions'   => $questions->filter( function( $item ) use ( $stage ){
 					return in_array( $item->id, $stage );
 				})->values()
 			];
