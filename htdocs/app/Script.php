@@ -64,6 +64,7 @@ class Script extends Model
 					return in_array( $item->id, $stage );
 				})->values()
 			];
+			++$i;
 		}
 		return $stages;
 	}

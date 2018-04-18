@@ -18,8 +18,18 @@ class Survey extends Model
         'specifications'
     ];
     protected $casts = [
+        'id'           => 'integer',
+        'subject_id'   => 'integer',
+        'event_id'     => 'integer',
+        'script_id'    => 'integer',
+        'hash'         => 'string',
         'is_completed' => 'boolean',
-        'subject_id' => 'integer'
+    ];
+    protected $dates = [
+        'last_answer_at',
+        'deleted_at',
+        'created_at',
+        'updated_at'
     ];
     protected $fillable = [
         'subject_id',

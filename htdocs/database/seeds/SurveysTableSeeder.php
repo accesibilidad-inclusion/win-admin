@@ -18,6 +18,7 @@ class SurveysTableSeeder extends Seeder
             'script_id'      => 1,
             'hash'           => Hash::make( str_random( 64 ) ),
             'is_completed'   => 0,
+            'created_at'     => ( new DateTime() )->format('Y-m-d H:i:s'),
             'last_answer_at' => ( new DateTime() )->format('Y-m-d H:i:s')
         ]);
     }
