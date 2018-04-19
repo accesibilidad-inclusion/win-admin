@@ -15,8 +15,8 @@ return [
     'supportsCredentials' => true,
     'allowedOrigins' => ['*'],
     'allowedOriginsPatterns' => [],
-    'allowedHeaders' => ['DNT','User-Agent','X-Requested-With','If-Modified-Since','Cache-Control','Content-Type','Range'],
-    'allowedMethods' => ['GET', 'POST', 'OPTIONS'],
+    'allowedHeaders' => ['*'],
+    'allowedMethods' => ['*'],
     'exposedHeaders' => [],
     'maxAge' => 0,
 ];

@@ -3,7 +3,6 @@
 namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
-use App\Http\Middleware\JsonContentType;
 
 class Kernel extends HttpKernel
 {
@@ -42,7 +41,7 @@ class Kernel extends HttpKernel
             'throttle:60,1',
             'bindings',
             'cors',
-            'json'
+            'json',
         ],
     ];
 
@@ -60,7 +59,7 @@ class Kernel extends HttpKernel
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'json' => JsonContentType::class,
+        'json' => \App\Http\Middleware\JsonContentType::class,
         'cors' => \Barryvdh\Cors\HandleCors::class
     ];
 }
