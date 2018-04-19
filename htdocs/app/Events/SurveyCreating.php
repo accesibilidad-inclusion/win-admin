@@ -23,7 +23,7 @@ class SurveyCreating
      */
     public function __construct( Survey $survey )
     {
-        $survey->hash = Hash::make( str_random( 64 ) );
+        $survey->hash = str_random( 64 );
         return $survey;
     }
 

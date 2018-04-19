@@ -12,7 +12,6 @@ class Survey extends Model
 
     ];
     protected $appends = [
-        'onboarding',
         'questionnaire',
         'aids',
         'specifications'
@@ -45,10 +44,6 @@ class Survey extends Model
     }
     public function script() {
         return $this->belongsTo('App\Script');
-    }
-    public function getOnboardingAttribute() : array
-    {
-        return [];
     }
     public function getQuestionnaireAttribute() {
         $script = Script::findOrFail( $this->script_id );

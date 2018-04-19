@@ -13,8 +13,9 @@ class Subject extends Model
         'last_connection_at'
     ];
     protected $casts = [
-        'works' => 'boolean',
-        'studies' => 'boolean',
+        'works'    => 'boolean',
+        'studies'  => 'boolean',
+        'birthday' => 'date'
     ];
     public static function getSexes()
     {
@@ -36,7 +37,7 @@ class Subject extends Model
     {
         $values = static::getSexes();
         if ( \array_key_exists( $val, static::getSexes() ) ) {
-            return $val;
+            $this->attributes['sex'] = $val;
         } else {
             throw new \InvalidArgumentException("The value {$val} it's not valid");
         }

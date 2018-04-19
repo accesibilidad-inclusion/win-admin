@@ -172,7 +172,7 @@ types:
                 body:
                     application/json:
                         type: Answer
-/event:
+/events:
     displayName: Eventos de aplicación
     /{hash}:
         get:
@@ -188,7 +188,7 @@ types:
                     body:
                         application/json:
                             type: Event
-/survey:
+/surveys:
     displayName: Aplicación de la encuesta
     /{id}:
         get:
@@ -227,7 +227,7 @@ types:
                 body:
                     application/json:
                         type: Survey
-/subject:
+/subjects:
     displayName: Usuario de la encuesta
     post:
         description: Crear un usuario
@@ -257,6 +257,10 @@ types:
                     works?: boolean
                     studies?: boolean
                     studies_at?: string
+                    works_at?: string
+                    birthday:
+                        description: Fecha de nacimiento, en formato YYYY-MM-DD
+                        type: date
         responses:
             201:
                 description: Sujeto creado correctamente

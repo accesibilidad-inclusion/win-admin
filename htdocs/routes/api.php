@@ -89,6 +89,8 @@ Route::prefix('v1')->group(function() {
 			$answer_data[ $key ] = $request->get( $key );
 		}
 
+		$answer_data = array_filter( $answer_data );
+
 		$answer = Answer::where([
 			'subject_id'  => $answer_data['subject_id'],
 			'survey_id'   => $answer_data['survey_id'],
@@ -118,8 +120,10 @@ Route::prefix('v1')->group(function() {
             'given_name'         => 'required|string|max:191',
             'family_name'        => 'required|string|max:191',
             'works'              => 'bool',
-            'studies'            => 'bool',
-            'studies_at'         => 'nullable|string|max:191',
+			'studies'            => 'bool',
+			'birthday'           => 'date_format:Y-m-d',
+			'works_at'           => 'nullable|string|max:191',
+			'studies_at'         => 'nullable|string|max:191',
             'personal_id'        => 'nullable|string|max:32',
             'consent_at'         => 'date_format:Y-m-d H:i:s',
             'last_connection_at' => 'date_format:Y-m-d H:i:s',
@@ -131,11 +135,13 @@ Route::prefix('v1')->group(function() {
 				case 'given_name':
 				case 'family_name':
 				case 'studies_at':
+				case 'works_at':
 					$subject->{$key} = filter_var( trim( $val ), FILTER_SANITIZE_STRING );
 					break;
 				case 'sex':
 				case 'works':
 				case 'studies':
+				case 'birthday':
 					$subject->{$key} = $val;
 					break;
 
