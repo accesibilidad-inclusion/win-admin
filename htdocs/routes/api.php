@@ -37,7 +37,6 @@ Route::prefix('v1')->group(function() {
 		}
 		return $questions->toJson();
 	});
-
 	Route::get('/surveys/{id}', function( Request $request, int $id ){
 		$survey = Survey::where([
 			'id' => $id,
