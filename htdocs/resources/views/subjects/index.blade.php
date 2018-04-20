@@ -16,5 +16,6 @@
 			</div>
 		</div>
 	@endforeach
+	{{ $subjects->links() }}
 	</div>
 @endsection

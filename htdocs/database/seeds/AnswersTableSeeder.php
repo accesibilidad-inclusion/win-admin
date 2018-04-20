@@ -4,6 +4,7 @@ use App\Script;
 use App\Question;
 use Illuminate\Database\Seeder;
 use App\Assistance;
+use App\Aid;
 
 class AnswersTableSeeder extends Seeder
 {
@@ -23,13 +24,14 @@ class AnswersTableSeeder extends Seeder
          * ---
          * aids_answer
          */
-        $script      = Script::find( 1 );
-        $specs       = collect(['home', 'outside', 'always']);
-        $assistances = Assistance::all();
+        $script = Script::find( 1 );
+        $specs  = collect(['home', 'outside', 'both']);
+        $aids   = Aid::all();
         foreach ( $script->questions_order as $question ) {
             if ( ! $question instanceof Question ) {
                 continue;
             }
+            // @agregar aleatoriamente especificación en las que lo solicitan
             if ( $question->needs_specification ) {
                 $specification = $specs->random();
             } else {
@@ -37,17 +39,26 @@ class AnswersTableSeeder extends Seeder
             }
             $option    = $question->options->random();
             $option_id = $option->id;
-            // @todo: agregar aleatoriamente especificación en las que lo solicitan
-            // @todo: cuando la opción es "sí con ayuda", añadir ayudas aleatoriamente
-            DB::table('answers')->insert([
+            $answer_id = DB::table('answers')->insertGetId([
                 'question_id'   => $question->id,
                 'subject_id'    => 1,
                 'survey_id'     => 1,
                 'option_id'     => $option->id,
-                'response_time' =>  mt_rand(5, 60)
+                'response_time' =>  mt_rand(5, 60),
+                'specification' => $specification
             ]);
-            if ( $option->type == 'yes' && $option->order == 3 ) {
-
+            // @todo: cuando la opción es "sí con ayuda", añadir ayudas aleatoriamente
+            if ( $option->value == 4 ) {
+                $selected_aids = $aids->random( mt_rand(1, count( $aids )) )->pluck('id');
+                if ( $selected_aids ) {
+                    foreach ( $selected_aids as $aid_id ) {
+                        DB::table('aid_answer')->insert([
+                            'aid_id'    => $aid_id,
+                            'answer_id' => $answer_id
+                        ]);
+                    }
+                }
+                // DB::table('aid_answer')->inse
             }
         }
     }

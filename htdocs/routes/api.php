@@ -41,8 +41,8 @@ Route::prefix('v1')->group(function() {
 	});
 	Route::get('/surveys/{id}', function( Request $request, int $id ){
 		$survey = Survey::where([
-			'id' => $id,
-			'hash' => $request->get('hash')
+			'id'   => $id,
+			'hash' => $request->header('X-WIN-SURVEY-HASH') ?? $request->get('hash')
 		])->firstOrFail();
 		return response( $survey->toJson() );
 	});
@@ -57,6 +57,16 @@ Route::prefix('v1')->group(function() {
 		]);
 		return response( $survey->toJson() )->setStatusCode( 201 );
 	});
+	Route::get('/surveys/{id}/results', function( Request $request, int $id ){
+		$survey = Survey::where([
+			'id' => $id,
+			'hash' => $request->header('X-WIN-SURVEY-HASH') ?? $request->get('hash')
+		])->firstOrFail();
+		$survey->append('results');
+		$results = $survey->results;
+		unset( $results->answers );
+		return response( json_encode( $results ) );
+	});
 	Route::get('/events/{hash}', function( Request $request ){
 		$event = Event::where([
 			'hash'   => $request->hash,
@@ -69,7 +79,6 @@ Route::prefix('v1')->group(function() {
 			'question_id'     => 'required|integer|exists:questions,id',
 			'subject_id'      => 'required|integer|exists:subjects,id',
 			'survey_id'       => 'required|integer|exists:surveys,id',
-			'hash'            => 'required|exists:surveys,hash',
 			'option_id'       => 'required|integer|exists:options,id',
 			'response_time'   => 'required|integer',
 			'specification.*' => 'string|in:home,outside',
@@ -82,7 +91,7 @@ Route::prefix('v1')->group(function() {
 		$survey = Survey::where([
 			'id' => $request->get('survey_id')
 		], ['id', 'hash'])->first();
-		if ( ! $survey || $request->get('hash') != $survey->hash ) {
+		if ( ! $survey || ( $request->header('X-WIN-SURVEY-HASH') != $survey->hash && $request->get('hash') != $survey->hash ) ) {
 			return response( json_encode('Código de acceso incorrecto') )->setStatusCode( 403 );
 		}
 

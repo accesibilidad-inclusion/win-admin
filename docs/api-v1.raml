@@ -118,6 +118,36 @@ types:
             deleted_at?: string
             created_at: string
             updated_at: string
+    Result:
+        type: object
+        properties:
+            dimensions:
+                type: ResultDimension[]
+    ResultDimension:
+        type: object
+        properties:
+            id: integer
+            label:
+                type: string
+                description: Nombre de la dimensión
+            values:
+                type: integer[]
+                description: Puntaje obtenido en cada pregunta de esta dimensión
+            score:
+                type: integer
+                description: Puntaje total de la dimensión obtenido por el usuario
+            max:
+                type: integer
+                description: Puntaje máximo que un usuario puede obtener en la dimensión
+            min:
+                type: integer
+                description: Puntaje mínimo que un usuario puede obtener en la dimensión
+            answered:
+                type: integer
+                description: Cantidad de preguntas que el usuario contestó en la dimensión
+            level:
+                enum: ['low', 'medium', 'high']
+                description: Nivel logrado por el usuario en la dimensión
 /answers:
     displayName: Respuestas
     post:
@@ -209,6 +239,22 @@ types:
                     body:
                         application/json:
                             type: Survey
+    /results:
+        get:
+            description: Obtener los resultados de la aplicación del cuestionario
+            queryParameters:
+                hash:
+                    description: Identificador de la aplicación (survey). Requerido si no se usa la cabecera X-WIN-SURVEY-HASH
+                    type: string
+            headers:
+                X-WIN-SURVEY-HASH:
+                    description: Identificador de la aplicación (survey)
+                    type: string
+            responses:
+                200:
+                    body:
+                        application/json:
+                            type: Result
     post:
         description: Crear una nueva aplicación
         body:

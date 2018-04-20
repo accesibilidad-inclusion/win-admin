@@ -24,7 +24,7 @@ class DimensionsTableSeeder extends Seeder
 			],
 			'Creencias de Control-Eficacia' => [
 				'Autodefensa',
-				'Locus de Control Interno',
+				'Locus de Control',
 				'Expectativas de Logro',
 				'Atribuciones de Eficacia'
 			],

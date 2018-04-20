@@ -53,4 +53,12 @@ class Answer extends Model
 	{
 		return $this->belongsToMany('App\Aid');
 	}
+	public function option()
+	{
+		return $this->belongsTo('App\Option');
+	}
+	public function question()
+	{
+		return $this->belongsTo('App\Question');
+	}
 }
