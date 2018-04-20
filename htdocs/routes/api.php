@@ -1,14 +1,16 @@
 <?php
 
 use App\Event;
+use App\Answer;
+use App\Option;
 use App\Script;
 use App\Survey;
 use App\Subject;
+use App\Question;
 use App\Assistance;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\StoreSubject;
-use App\Answer;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,6 +47,10 @@ Route::prefix('v1')->group(function() {
 		return response( $survey->toJson() );
 	});
 	Route::post('/surveys', function( Request $request ){
+		$validate = $request->validate([
+			'subject_id' => 'required|integer|exists:subjects,id',
+			'script_id'  => 'nullable|integer|exists:scripts,id'
+		]);
 		$survey = Survey::create([
 			'subject_id' => $request->get('subject_id'),
 			'script_id'  => $request->get('script_id') ?? 1
@@ -71,10 +77,36 @@ Route::prefix('v1')->group(function() {
 		]);
 
 		// verificar cumplimiento de reglas de negocio:
+
 		// - el hash debe coincidir con el survey_id → si no, 403
+		$survey = Survey::where([
+			'id' => $request->get('survey_id')
+		], ['id', 'hash'])->first();
+		if ( ! $survey || $request->get('hash') != $survey->hash ) {
+			return response( json_encode('Código de acceso incorrecto') )->setStatusCode( 403 );
+		}
+
 		// - el option_id debe estar asociado al question_id → si no, 422
+		$option_question_match = Option::where([
+			'id'          => $request->get('option_id'),
+			'question_id' => $request->get('question_id')
+		])->first();
+		if ( ! $option_question_match ) {
+			return response( json_encode('La respuesta no corresponde a una de las opciones de la pregunta') )->setStatusCode( 422 );
+		}
+
 		// - el question_id debe ser parte del survey → si no, 422
+		$survey->load('script');
+		$question_ids = collect( $survey->script->getAttributeValue('questions_order') )->pluck('id');
+		if ( ! $question_ids->has( $request->get('question_id') ) ) {
+			return response( json_encode('La pregunta no es parte del guión especificado') )->setStatusCode( 422 );
+		}
+
 		// - sólo debe tener specificacion en caso de que la pregunta lo requiera → si no, 422
+		$question = Question::find( $request->get('question_id') );
+		if ( ! $question->needs_specification && $request->get('specification') ) {
+			return response( json_encode('La pregunta señalada no debe indicar especificación') )->setStatusCode( 422 );
+		}
 
 		$answer_data = [];
 		foreach ( [
@@ -104,8 +136,9 @@ Route::prefix('v1')->group(function() {
 
 		$answer->save();
 
-		// @todo añadir "aids"
 		$answer->aids()->sync( $request->get('aids') );
+
+		// cargar "aids" para mostrarlas en la respuesta
 		$answer->load('aids');
 
 		return response( $answer->toJson( ) )->setStatusCode( $answer->wasRecentlyCreated ? 201 : 200 );
