@@ -3,15 +3,17 @@
 namespace App;
 
 use App\Events\SurveyCreating;
+use MathPHP\Statistics\Average;
 use Illuminate\Support\Facades\DB;
+use MathPHP\Statistics\Descriptive;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Survey extends Model
 {
-	protected $hidden = [
-
-	];
+	use SoftDeletes;
+	protected $hidden = [];
 	protected $appends = [
 		'questionnaire',
 		'aids',
@@ -58,25 +60,42 @@ class Survey extends Model
 		}
 
 		$dimension_values = [];
+		$dimension_answers = [];
 		// agrupar respuestas por dimensión
 		foreach ( $answers as $answer ) {
 			$dimension_or_indicator_id = $answer->question->dimension_id;
 			foreach ( $buckets as $dimension_id => $bucket_dimensions ) {
 				if ( in_array( $dimension_or_indicator_id, $bucket_dimensions ) ) {
 					$dimension_values[ $dimension_id ][] = $answer->option->value;
+					$dimension_answers[ $dimension_id ][] = $answer;
 				}
 			}
 		}
 
 		$dimensions_raw = DB::table('dimensions')->where('parent_id', 0)->get();
 		$dimensions = [];
+		$aggregated = (object) [
+			'score'    => 0,
+			'max'      => 0,
+			'min'      => 0,
+			'answered' => 0,
+			'level'    => ''
+		];
 		foreach ( $dimensions_raw as $dimension ) {
 			unset( $dimension->parent_id, $dimension->created_at, $dimension->updated_at );
-			$dimension->values = $dimension_values[ $dimension->id ];
-			$dimension->score = array_sum( $dimension->values );
-			$dimension->max = count( $dimension->values ) * 6;
-			$dimension->min = count( $dimension->values ) * 1;
-			$dimension->answered = count( $dimension->values );
+			$dimension->values     = $dimension_values[ $dimension->id ];
+			$dimension->answers    = $dimension_answers[ $dimension->id ];
+			$dimension->indicators = $buckets[ $dimension->id ];
+			$dimension->score      = array_sum( $dimension->values );
+			$dimension->answered   = count( $dimension->values );
+			$dimension->max        = $dimension->answered * 6;
+			$dimension->min        = $dimension->answered * 1;
+
+			// añadir a resultados totales
+			$aggregated->answered += $dimension->answered;
+			$aggregated->score    += $dimension->score;
+			$aggregated->max      += $dimension->max;
+			$aggregated->min      += $dimension->min;
 
 			// indicar nivel según puntje máximo
 			switch ( $dimension->max ) {
@@ -109,13 +128,59 @@ class Survey extends Model
 					break;
 			}
 
+			$dimension->stats = $this->buildStats( $dimension );
+
 			$dimensions[] = $dimension;
 		}
+
+		// resultados totales
+		if ( $aggregated->score > 190 ) {
+			$aggregated->level = 'high';
+		} elseif ( $aggregated->score > 116 ) {
+			$aggregated->level = 'medium';
+		} else {
+			$aggregated->level = 'low';
+		}
+
+		$aggregated->values = collect( $dimension_values )->flatten()->toArray();
+		$aggregated->stats = $this->buildStats( $aggregated );
+		unset( $aggregated->values );
 
 		return (object) [
 			'dimensions' => $dimensions,
 			'answers'    => $answers,
+			'aggregated' => $aggregated
 		];
+	}
+
+	private function buildStats( $data )
+	{
+		// promedio
+		$mean = Average::mean( $data->values );
+		// media
+		$median = Average::median( $data->values );
+		// moda
+		$mode = Average::mode( $data->values );
+		// varianza
+		$variance = Descriptive::sampleVariance( $data->values );
+		// desviación estándar
+		$standard_deviation = Descriptive::standardDeviation( $data->values );
+		return (object) compact('mean', 'median', 'mode', 'variance', 'standard_deviation');
+	}
+
+	public function getLevelLabel( string $level ) : string
+	{
+		switch ( $level ) {
+			case 'low':
+				return 'Bajo';
+				break;
+			case 'medium':
+				return 'Medio';
+				break;
+			case 'high':
+				return 'Alto';
+				break;
+		}
 	}
 
 	public function subject() {

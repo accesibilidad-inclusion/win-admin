@@ -22,7 +22,8 @@ class SubjectsTableSeeder extends Seeder
             'studies_at'         => '',
             'last_connection_at' => $now,
             'created_at'         => $now,
-            'updated_at'         => $now
+            'updated_at'         => $now,
+            'birthday'           => ( new DateTime() )->sub( new DateInterval('P16Y') )
         ]);
         DB::table('impairment_subject')->insert([
             'impairment_id' => 5,

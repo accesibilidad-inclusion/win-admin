@@ -3,9 +3,11 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Subject extends Model
 {
+    use SoftDeletes;
     protected $dates = [
         'created_at',
         'updated_at',
@@ -17,6 +19,9 @@ class Subject extends Model
         'studies'  => 'boolean',
         'birthday' => 'date'
     ];
+    protected $appends = [
+        'age'
+    ];
     public static function getSexes()
     {
         return [
@@ -24,6 +29,22 @@ class Subject extends Model
             'male'   => 'Hombre',
             'other'  => 'Otro'
         ];
+    }
+    public function getAgeAttribute()
+    {
+        if ( ! $this->birthday ) {
+            return '';
+        }
+        $today = new \DateTime();
+        $difference = $this->birthday->diff( $today, true );
+        return $difference->y;
+    }
+    public function getRelativeAge( \DateTimeInterface $date )
+    {
+        if ( ! $this->birthday ) {
+            return '';
+        }
+        return $this->birthday->diff( $date, true );
     }
     public function setPersonalIdAttribute( $id )
     {
