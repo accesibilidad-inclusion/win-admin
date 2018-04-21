@@ -11,6 +11,7 @@
 						<th>Fecha de Nacimiento</th>
 						<th>Estudia</th>
 						<th>Trabaja</th>
+						<th>Discapacidad</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -19,6 +20,7 @@
 						<td>{{ $subject->birthday->format('d F Y') }}</td>
 						<td>@if ( $subject->studies ) Sí: {{ $subject->studies_at }}@else No @endif</td>
 						<td>@if ( $subject->works ) Sí: {{ $subject->works_at }}@else No @endif</td>
+						<td>{{ $subject->impairments->pluck('label')->implode(' / ') }}</td>
 					</tr>
 				</tbody>
 			</table>
