@@ -72,7 +72,7 @@ class SubjectController extends Controller
      */
     public function show(Subject $subject)
     {
-        $subject->load('surveys');
+        $subject->load('surveys')->paginate( 10 );
         return view('subjects.show', [
             'subject' => $subject
         ]);

@@ -47,7 +47,7 @@ class Survey extends Model
 		// cargar las preguntas y respuestas que corresponden a esta aplicación
 		$answers = Answer::where([
 			'survey_id' => $this->id
-		])->get()->load(['question', 'option']);
+		])->get()->load(['question', 'option', 'aids']);
 		$dimension_ids             = $answers->pluck('question.dimension_id')->unique()->filter()->values();
 
 		$indicators = DB::table('dimensions')->whereIn('id', $dimension_ids)->get();
@@ -188,6 +188,14 @@ class Survey extends Model
 	}
 	public function script() {
 		return $this->belongsTo('App\Script');
+	}
+	public function answers()
+	{
+		return $this->belongsToMany('App\Answer');
+	}
+	public function getRelativeAge()
+	{
+		return $this->subject->getRelativeAge( $this->created_at );
 	}
 	public function getQuestionnaireAttribute() {
 		$script = Script::findOrFail( $this->script_id );

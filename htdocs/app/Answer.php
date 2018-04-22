@@ -61,4 +61,8 @@ class Answer extends Model
 	{
 		return $this->belongsTo('App\Question');
 	}
+	public function survey()
+	{
+		return $this->belongsTo('App\Survey');
+	}
 }

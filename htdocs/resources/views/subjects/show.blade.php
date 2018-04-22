@@ -77,6 +77,30 @@
 						@endforeach
 						</div>
 					</div>
+					<table class="table table-striped table-hover">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Pregunta</th>
+								<th>Respuesta</th>
+								<th>Lugar</th>
+								<th>Ayudas</th>
+								<th>Tiempo de respuesta</th>
+							</tr>
+						</thead>
+						<tbody>
+						@foreach ( $survey->results->answers as $answer )
+							<tr>
+								<td>{{ $answer->question->id }}</td>
+								<td>{{ $answer->question->formulation }}</td>
+								<td>{{ $answer->option->value }} - {{ $answer->option->label }}</td>
+								<td>{{ implode(' + ', $answer->specification ) }}</td>
+								<td>{{ $answer->aids->pluck('label')->implode(' / ') }}</td>
+								<td>{{ $answer->response_time }} segundos</td>
+							</tr>
+						@endforeach
+						</tbody>
+					</table>
 				</div>
 			</div>
 			@endforeach

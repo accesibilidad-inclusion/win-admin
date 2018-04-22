@@ -9,6 +9,9 @@
 		<li class="nav-item">
 			<a href="{{ route('subjects.create') }}" class="nav-link{{ Request::routeIs('subjects.create') ? ' active' : ''}}">Crear nuevo usuario</a>
 		</li>
+		<li class="nav-item">
+			<a href="{{ route('reports.show') }}" class="nav-link{{ Request::routeIs('reports.show') ? ' active' : ''}}">Informes grupales</a>
+		</li>
 	</ul>
 </nav>
 @endsection
