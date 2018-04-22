@@ -151,8 +151,10 @@ class ReportController extends Controller
     private function getAgeRanges()
     {
         $ages = DB::table('subjects')
-            ->selectRaw('COUNT(id) as count, TIMESTAMPDIFF( YEAR, birthday, CURDATE() ) AS age')
+            ->leftJoin('surveys', 'subjects.id', '=', 'surveys.subject_id')
+            ->selectRaw('COUNT(surveys.id) as count, TIMESTAMPDIFF( YEAR, subjects.birthday, surveys.created_at ) AS age')
             ->groupBy('age')
+            ->orderBy('age', 'ASC')
             ->get();
         return $ages;
     }

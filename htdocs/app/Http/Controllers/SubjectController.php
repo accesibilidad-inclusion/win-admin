@@ -21,10 +21,43 @@ class SubjectController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index( Request $request )
     {
+        $params = array_filter( $request->all(), function ( $item ){
+            return ! is_null( $item );
+        });
+        unset( $params['_token'], $params['impairment'], $params['page'], $params['name'] );
+
+        if ( empty( $params ) ) {
+            $subjects = Subject::latest()->paginate( 10 );
+        } else {
+            $subjects = Subject::where( $params )->orderBy('created_at', 'desc');
+            if ( $request->get('name') ) {
+                $subjects->where('given_name', 'like', '%'. $request->get('name') .'%');
+                $subjects->orWhere('family_name', 'like', '%'. $request->get('name') .'%');
+            }
+            if ( $request->get('impairment') ) {
+                $subjects->leftJoin('impairment_subject', 'subjects.id', '=', 'impairment_subject.subject_id');
+                $subjects->where('impairment_id', $request->get('impairment'));
+            }
+            $subjects = $subjects->paginate( 10 );
+            foreach ( $params as $key => $val ) {
+                $subjects->appends( $key, $val );
+            }
+            if ( $request->get('impairment') ) {
+                $subjects->appends('impairment', $request->get('impairment'));
+            }
+            if ( $request->get('name') ) {
+                $subjects->appends('name', $request->get('name'));
+            }
+        }
+
+
+        $impairments = Impairment::all();
         return view('subjects.index', [
-            'subjects' => Subject::latest()->paginate( 10 )
+            'request' => $request,
+            'subjects' => $subjects,
+            'impairments' => $impairments
         ]);
     }
 
