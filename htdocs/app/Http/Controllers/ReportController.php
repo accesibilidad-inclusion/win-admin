@@ -6,8 +6,10 @@ use App\Answer;
 use App\Subject;
 use App\Dimension;
 use App\Impairment;
+use Box\Spout\Common\Type;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Box\Spout\Writer\WriterFactory;
 use MathPHP\Statistics\Descriptive;
 
 class ReportController extends Controller
@@ -26,10 +28,10 @@ class ReportController extends Controller
             $this->generateExport( $params );
         }
 
-        // $results = null;
-        // if ( ! empty( $params ) ) {
+        $results = null;
+        if ( ! empty( $params ) ) {
             $results = $this->buildReportResults( $params );
-        // }
+        }
 
         return view('reports.show', [
             'impairments' => $impairments,
@@ -65,9 +67,20 @@ class ReportController extends Controller
             }
         }
         $fp = fopen('php://temp/maxmemory'. 16*1024*1024, 'r+');
-        $question_ids = array_keys( current( $rows ) );
-        array_unshift( $question_ids, 'subject' );
-        \fputcsv( $fp, $question_ids );
+        $headers = array_keys( current( $rows ) );
+        array_unshift( $headers, 'subject' );
+
+        // @todo exportación a XLS
+        // $writer = WriterFactory::create( Type::XLSX );
+        // $writer->openToBrowser( 'export-'. time().'.xlsx' );
+        // $writer->addRow( $headers );
+        // foreach ( $rows as $subject_id => $answers ) {
+        //     \array_unshift( $answers, $subject_id );
+        //     $writer->addRow( $answers );
+        // }
+        // $writer->close();
+
+        \fputcsv( $fp, $headers );
         foreach ( $rows as $subject_id => $answers ) {
             \array_unshift( $answers, $subject_id );
             \fputcsv( $fp, $answers );
