@@ -26,11 +26,12 @@ class SubjectController extends Controller
         $params = array_filter( $request->all(), function ( $item ){
             return ! is_null( $item );
         });
-        unset( $params['_token'], $params['impairment'], $params['page'], $params['name'] );
+        unset( $params['_token'], $params['impairment'], $params['page'] );
 
         if ( empty( $params ) ) {
             $subjects = Subject::latest()->paginate( 10 );
         } else {
+            unset( $params['name'] );
             $subjects = Subject::where( $params )->orderBy('created_at', 'desc');
             if ( $request->get('name') ) {
                 $subjects->where('given_name', 'like', '%'. $request->get('name') .'%');
@@ -51,7 +52,6 @@ class SubjectController extends Controller
                 $subjects->appends('name', $request->get('name'));
             }
         }
-
 
         $impairments = Impairment::all();
         return view('subjects.index', [
