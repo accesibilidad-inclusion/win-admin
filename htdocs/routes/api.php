@@ -94,7 +94,7 @@ Route::prefix('v1')->group(function() {
 		if ( ! $survey || ( $request->header('X-WIN-SURVEY-HASH') != $survey->hash && $request->get('hash') != $survey->hash ) ) {
 			return response( json_encode('Código de acceso incorrecto') )->setStatusCode( 403 );
 		}
-		if ( ! $survey->subject_id != $request->get('subject_id') ) {
+		if ( $survey->subject_id != $request->get('subject_id') ) {
 			return response( json_encode('El id del sujeto no coincide con el Survey') )->setStatusCode( 403 );
 		}
 
