@@ -46,16 +46,14 @@
 								<th scope="row">Puntaje general</th>
 								<td>{{ $survey->results->aggregated->score }} ({{ $survey->getLevelLabel( $survey->results->aggregated->level ) }})</td>
 							</tr>
+							@foreach ( $survey->results->dimensions as $dimension )
 							<tr>
-								<th scope="row">Estadísticas</th>
+								<th scope="row">{{ $dimension->label }}</th>
 								<td>
-									Puntaje Promedio: {{ $survey->results->aggregated->stats->mean }}<br>
-									Media: {{ $survey->results->aggregated->stats->median }}<br>
-									Moda: {{ implode(' / ', $survey->results->aggregated->stats->mode ) }}<br>
-									Varianza: {{ $survey->results->aggregated->stats->variance }}<br>
-									Desviación Estándar: {{ $survey->results->aggregated->stats->standard_deviation }}
+									Puntaje: {{ $dimension->score }} (Nivel {{ $dimension->level }})
 								</td>
 							</tr>
+							@endforeach
 						</tbody>
 					</table>
 					<div class="mb-3">

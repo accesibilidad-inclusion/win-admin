@@ -90,9 +90,12 @@ Route::prefix('v1')->group(function() {
 		// - el hash debe coincidir con el survey_id → si no, 403
 		$survey = Survey::where([
 			'id' => $request->get('survey_id')
-		], ['id', 'hash'])->first();
+		], ['id', 'hash', 'subject_id'])->first();
 		if ( ! $survey || ( $request->header('X-WIN-SURVEY-HASH') != $survey->hash && $request->get('hash') != $survey->hash ) ) {
 			return response( json_encode('Código de acceso incorrecto') )->setStatusCode( 403 );
+		}
+		if ( ! $survey->subject_id != $request->get('subject_id') ) {
+			return response( json_encode('El id del sujeto no coincide con el Survey') )->setStatusCode( 403 );
 		}
 
 		// - el option_id debe estar asociado al question_id → si no, 422
