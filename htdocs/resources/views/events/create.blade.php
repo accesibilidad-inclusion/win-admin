@@ -11,7 +11,7 @@
 				@if ( $event->exists )
 				<div class="form-group mt-4 mb-4">
 					<p class="h6">Link de Invitación:</p>
-					<span class="h5">{{ url('/event/'. $event->hash ) }}</span>
+					<span class="h5"><a href="https://app.apoyos.win/#/event/{{ $event->hash }}" target="_blank">https://app.apoyos.win/#/event/{{ $event->hash }}</a></span>
 					<div class="row mt-2">
 						{{-- @todo: Definir e implementar mecanismos para compartir --}}
 						<div class="col">Enviar invitación por E-mail</div>
