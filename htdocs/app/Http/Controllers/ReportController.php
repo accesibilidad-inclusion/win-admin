@@ -110,15 +110,17 @@ class ReportController extends Controller
             }
             $subjects_query[ $key ] = $val;
         }
-        $subjects = Subject::where( $subjects_query);
-        if ( ! empty( $params['impairment'] ) ) {
-            $subjects->leftJoin('impairment_subject', 'subjects.id', '=', 'impairment_subject.subject_id');
-            $subjects->where('impairment_id', $params['impairment']);
-        }
-        $subjects = $subjects->get();
-        $answers  = Answer::whereIn('subject_id', $subjects->pluck('id'))
-            ->with(['question', 'option', 'aids', 'question.dimension', 'survey'])
+        $answers = DB::table('answers')
+            ->join('questions', 'answers.question_id', '=', 'questions.id')
+            ->join('dimensions', 'questions.dimension_id', '=', 'dimensions.id')
+            ->join('options', 'answers.option_id', '=', 'options.id')
+            ->join('subjects', 'answers.subject_id', '=', 'subjects.id')
+            ->where( $subjects_query )
+            ->groupBy(['dimensions.parent_id', 'options.value'])
+            ->selectRaw('count(answers.subject_id) as q')
+            ->addSelect(['options.value', 'dimensions.parent_id as dimension'])
             ->get();
+        $subjects = Subject::where( $subjects_query )->count('id');
         return (object) [
             'answers'  => $answers,
             'subjects' => $subjects
@@ -128,24 +130,20 @@ class ReportController extends Controller
     {
         $dimensions = Dimension::all();
         $segment    = $this->getSegment( $params );
-        $answers    = $segment->answers;
-        $aggregated = [];
-        foreach ( $answers as $answer ) {
-            $dimension_id = $answer->question->dimension->parent_id === 0 ? $answer->question->dimension->parent_id : $answer->question->dimension->parent_id;
-            $values_by_dimension[ $dimension_id ]['values'][] = $answer->option->value;
-            $aggregated['values'][] = $answer->option->value;
+        $values_by_dimension = [];
+        foreach ( $segment->answers as $answer ) {
+            $values_by_dimension[ $answer->dimension ]['by_value'][ $answer->value ] = $answer->q;
+            if ( ! isset( $values_by_dimension[ $answer->dimension ]['dimension'] ) ) {
+                $values_by_dimension[ $answer->dimension ]['dimension'] = $dimensions->find(  $answer->dimension );
+            }
+            if ( ! isset( $values_by_dimension[ $answer->dimension ]['total_answers'] ) ) {
+                $values_by_dimension[ $answer->dimension ]['total_answers'] = $segment->answers->where( 'dimension', $answer->dimension )->pluck('q')->sum();
+            }
+            $values_by_dimension[ $answer->dimension ]['percents'][ $answer->value ] = round( $answer->q / $values_by_dimension[ $answer->dimension ]['total_answers'] * 100, 3 );
         }
-        $result_dimensions = [];
-        foreach ( $values_by_dimension as $dimension_id => $val ) {
-            $values_by_dimension[ $dimension_id ]['dimension'] = $dimensions->find( $dimension_id );
-            $values_by_dimension[ $dimension_id ]['stats'] = Descriptive::describe( $val['values'] );
-            $result_dimensions[] = (object) $values_by_dimension[ $dimension_id ];
-        }
-        $aggregated['stats'] = (object) Descriptive::describe( $aggregated['values'] );
         return (object) [
-            'subjects_count' => $answers->pluck('subject_id')->unique()->count(),
-            'dimensions'     => $values_by_dimension,
-            'aggregated'     => (object) $aggregated,
+            'subjects_count' => $segment->subjects,
+            'dimensions'     => $values_by_dimension
         ];
     }
     private function getAgeRanges()

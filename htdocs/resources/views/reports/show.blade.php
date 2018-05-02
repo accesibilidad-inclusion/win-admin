@@ -66,7 +66,6 @@ use App\Subject;
 				</div>
 			</div>
 		</div>
-		{{ csrf_field() }}
 	</form>
 	@if ( $results )
 	<div class="alert{{ $results->subjects_count ? ' alert-info' : ' alert-warninig'}}">
@@ -75,33 +74,32 @@ use App\Subject;
 	<table class="mb-4 table table-striped table-hover">
 		<thead>
 			<th>Dimensión</th>
-			<th>Media</th>
-			<th>Moda</th>
-			<th>Mediana</th>
-			<th>Varianza</th>
-			<th>Desviación Est.</th>
+			<th>1</th>
+			<th>2</th>
+			<th>3</th>
+			<th>4</th>
+			<th>5</th>
+			<th>6</th>
 		</thead>
 		<tbody>
 			@foreach ( $results->dimensions as $dimension )
 			<tr>
 				<th scope="row">{{ $dimension['dimension']->label }}</th>
-				<td>{{ $dimension['stats']['mean'] }}</td>
-				<td>{{ implode(' / ', $dimension['stats']['mode'] ) }}</td>
-				<td>{{ $dimension['stats']['median'] }}</td>
-				<td>{{ $dimension['stats']['variance'] }}</td>
-				<td>{{ $dimension['stats']['sd'] }}</td>
+				@foreach ( $dimension['percents'] as $val => $percent )
+				<td>{{ $percent }}%</td>
+				@endforeach
 			</tr>
 			@endforeach
 		</tbody>
 		<tfooter>
-			<tr>
+{{-- 			<tr>
 				<th scope="row">Total</th>
 				<td>{{ $results->aggregated->stats->mean }}</td>
 				<td>{{ implode(' / ', $results->aggregated->stats->mode ) }}</td>
 				<td>{{ $results->aggregated->stats->median }}</td>
 				<td>{{ $results->aggregated->stats->variance }}</td>
 				<td>{{ $results->aggregated->stats->sd }}</td>
-			</tr>
+			</tr> --}}
 		</tfooter>
 	</table>
 	@endif
