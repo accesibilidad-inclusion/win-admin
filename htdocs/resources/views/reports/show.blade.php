@@ -73,7 +73,7 @@ use App\Subject;
 	</div>
 	<table class="mb-4 table table-striped table-hover">
 		<thead>
-			<th>Dimensión</th>
+			<th>Dimensión/Valor</th>
 			<th>1</th>
 			<th>2</th>
 			<th>3</th>

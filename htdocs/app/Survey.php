@@ -48,7 +48,7 @@ class Survey extends Model
 		$answers = Answer::where([
 			'survey_id' => $this->id
 		])->get()->load(['question', 'option', 'aids']);
-		$dimension_ids             = $answers->pluck('question.dimension_id')->unique()->filter()->values();
+		$dimension_ids = $answers->pluck('question.dimension_id')->unique()->filter()->values();
 
 		$indicators = DB::table('dimensions')->whereIn('id', $dimension_ids)->get();
 		$indicators_by_dimension = $indicators->groupBy('parent_id');
@@ -83,9 +83,9 @@ class Survey extends Model
 		];
 		foreach ( $dimensions_raw as $dimension ) {
 			unset( $dimension->parent_id, $dimension->created_at, $dimension->updated_at );
-			$dimension->values     = $dimension_values[ $dimension->id ];
-			$dimension->answers    = $dimension_answers[ $dimension->id ];
-			$dimension->indicators = $buckets[ $dimension->id ];
+			$dimension->values     = $dimension_values[ $dimension->id ] ?? [];
+			$dimension->answers    = $dimension_answers[ $dimension->id ] ?? [];
+			$dimension->indicators = $buckets[ $dimension->id ] ?? [];
 			$dimension->score      = array_sum( $dimension->values );
 			$dimension->answered   = count( $dimension->values );
 			$dimension->max        = $dimension->answered * 6;
@@ -97,7 +97,8 @@ class Survey extends Model
 			$aggregated->max      += $dimension->max;
 			$aggregated->min      += $dimension->min;
 
-			// indicar nivel según puntje máximo
+			// indicar nivel según puntaje máximo
+			$dimension->level = '';
 			switch ( $dimension->max ) {
 				case 96:
 					if ( $dimension->score > 69 ) {

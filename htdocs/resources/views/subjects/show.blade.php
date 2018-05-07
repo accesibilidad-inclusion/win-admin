@@ -62,7 +62,7 @@
 							<div class="col-sm-3">
 								<h6>{{ $dimension->label }}</h6>
 								<div class="progress" style="height:2rem">
-									<div class="progress-bar @if ( $dimension->level == 'low' ) bg-danger @elseif ( $dimension->level == 'medium' ) bg-warning @else bg-success @endif" style="width:{{ ( $dimension->score / $dimension->max ) * 100 }}%" role="progressbar" aria-valuenow="{{ $dimension->score }}" aria-valuemax="{{ $dimension->max }}" aria-valuemin="{{ $dimension->min }}" data-level="{{ $dimension->level }}">
+									<div class="progress-bar @if ( $dimension->level == 'low' ) bg-danger @elseif ( $dimension->level == 'medium' ) bg-warning @else bg-success @endif" style="width:{{ $dimension->max > 0 ? ( $dimension->score / $dimension->max ) * 100 : 0 }}%" role="progressbar" aria-valuenow="{{ $dimension->score }}" aria-valuemax="{{ $dimension->max }}" aria-valuemin="{{ $dimension->min }}" data-level="{{ $dimension->level }}">
 										{{ $dimension->score }}/{{ $dimension->max }}
 									</div>
 								</div>
