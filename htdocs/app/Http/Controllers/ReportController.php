@@ -42,37 +42,93 @@ class ReportController extends Controller
     }
     private function generateExport( array $params )
     {
-        $segment            = $this->getSegment( $params );
-        $answers_by_subject = $segment->answers->groupBy('subject_id');
-        $rows = [];
-        foreach ( $answers_by_subject as $subject_id => $answers ) {
-            $subject = $segment->subjects->find($subject_id);
-            foreach ( $subject->makeHidden([
-                'id',
-                'personal_id',
-                'given_name',
-                'family_name',
-                'consent_at',
-                'works_at',
-                'studies_at',
-                'last_connection_at',
-                'deleted_at',
-                'created_at',
-                'updated_at'
-            ])->toArray() as $key => $val ) {
-                $rows[ $subject_id ][ $key ] = $val;
+        // $segment            = $this->getSegment( $params );
+        $subjects_query = [];
+        foreach ( $params as $key => $val ) {
+            if ( $key == 'impairment' ) {
+                continue;
             }
-            foreach ( $answers as $answer ) {
-                $rows[ $subject_id ][ $answer->question->id ] = $answer->option->value;
-            }
+            $subjects_query[ $key ] = $val;
         }
+        $answers = DB::table('answers')
+            ->join('questions', 'answers.question_id', '=', 'questions.id')
+            ->join('options', 'answers.option_id', '=', 'options.id')
+            ->join('subjects', 'answers.subject_id', '=', 'subjects.id')
+            ->where( $subjects_query )
+            ->addSelect([
+                'answers.subject_id',
+                'subjects.sex',
+                'subjects.birthday',
+                'subjects.works',
+                'subjects.studies',
+                'answers.survey_id AS survey',
+                'answers.question_id AS question',
+                'options.value',
+            ])
+            ->get();
+        $subject_impairments = DB::table('impairment_subject')
+            ->whereIn('subject_id', $answers->pluck('subject_id')->unique() )
+            ->orderBy('impairment_id', 'asc')
+            ->get()
+            ->groupBy('subject_id');
+        $impairments = Impairment::all()->pluck('label', 'id')->toArray();
+        $rows = [];
+        foreach ( $answers as $answer ) {
+            if ( ! isset( $rows[ $answer->survey ] ) ) {
+                $rows[ $answer->survey ] = [
+                    'survey'  => $answer->survey,
+                    'subject' => $answer->subject_id,
+                    'sex'     => $answer->sex,
+                    'works'   => $answer->works,
+                    'studies' => $answer->studies,
+                ];
+                if ( ! isset( $rows[ $answer->survey ]['impairments'] ) ) {
+                    $survey_subject_impairments = $subject_impairments->get( $answer->subject_id );
+                    if ( $survey_subject_impairments ) {
+                        $survey_subject_impairments_ids = $survey_subject_impairments->pluck('impairment_id')->toArray();
+                    } else {
+                        $survey_subject_impairments_ids = [];
+                    }
+                    foreach ( $impairments as $key => $impairment ) {
+                        $rows[ $answer->survey ]['impairments'][ $key ] = in_array( $key, $survey_subject_impairments_ids ) ? 1 : 0;
+                    }
+                }
+            }
+            $rows[ $answer->survey ]['questions'][ $answer->question ] = $answer->value;
+        }
+        // no necesito más esto
+        unset( $answers, $subject_impairments, $impairments );
+
+        // $answers_by_subject = $segment->answers->groupBy('subject_id');
+        // $rows = [];
+        // foreach ( $answers_by_subject as $subject_id => $answers ) {
+        //     $subject = $segment->subjects->find($subject_id);
+        //     foreach ( $subject->makeHidden([
+        //         'id',
+        //         'personal_id',
+        //         'given_name',
+        //         'family_name',
+        //         'consent_at',
+        //         'works_at',
+        //         'studies_at',
+        //         'last_connection_at',
+        //         'deleted_at',
+        //         'created_at',
+        //         'updated_at'
+        //     ])->toArray() as $key => $val ) {
+        //         $rows[ $subject_id ][ $key ] = $val;
+        //     }
+        //     foreach ( $answers as $answer ) {
+        //         $rows[ $subject_id ][ $answer->question->id ] = $answer->option->value;
+        //     }
+        // }
         $fp = fopen('php://temp/maxmemory'. 16*1024*1024, 'r+');
-        $headers = array_keys( current( $rows ) );
-        array_unshift( $headers, 'subject' );
+        // $headers = array_keys( current( $rows ) );
+        // array_unshift( $headers, 'subject' );
 
         // @todo exportación a XLS
-        // $writer = WriterFactory::create( Type::XLSX );
-        // $writer->openToBrowser( 'export-'. time().'.xlsx' );
+        $writer = WriterFactory::create( Type::XLSX );
+        $writer->openToBrowser( 'export-'. time().'.xlsx' );
         // $writer->addRow( $headers );
         // foreach ( $rows as $subject_id => $answers ) {
         //     \array_unshift( $answers, $subject_id );
@@ -80,11 +136,29 @@ class ReportController extends Controller
         // }
         // $writer->close();
 
-        \fputcsv( $fp, $headers );
-        foreach ( $rows as $subject_id => $answers ) {
-            \array_unshift( $answers, $subject_id );
-            \fputcsv( $fp, $answers );
+        // \fputcsv( $fp, $headers );
+
+
+        foreach ( $rows as $row ) {
+            $survey = [];
+            foreach ( $row as $key => $val ) {
+                if ( is_array( $val ) ) {
+                    foreach ( $val as $row_val ) {
+                        $survey[] = $row_val;
+                    }
+                } else {
+                    $survey[] = $val;
+                }
+            }
+
+            $writer->addRow( $survey );
+
+
+            // \fputcsv( $fp, $survey );
         }
+
+        $writer->close();
+        exit;
         rewind( $fp );
         // obtener contenido del archivo como un string
         $output = stream_get_contents( $fp );
