@@ -58,6 +58,6 @@
 @endsection
 
 @section('footer_scripts')
-	<script src="{{ asset('js/institutions.js') }}"></script>
+	<script src="{{ mix('js/institutions.js') }}"></script>
 	<script src="https://maps.googleapis.com/maps/api/js?v=3&amp;hl=es&amp;libraries=places&amp;key={{ env('GOOGLE_API_KEY') }}"></script>
 @endsection
