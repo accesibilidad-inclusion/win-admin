@@ -35,9 +35,12 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="">Institución asociada</label>
-					<select name="" id="" class="form-control">
-
+					<label for="institution">Institución asociada</label>
+					<select name="institution_id" id="event__institution" class="form-control">
+						<option value=""></option>
+						@foreach ( $institutions as $institution )
+						<option value="{{ $institution->id }}"{{ $event->institution && $event->institution->id == $institution->id ? ' selected="selected"' : ''}}>{{ $institution->name }}</option>
+						@endforeach
 					</select>
 				</div>
 				<div class="form-group">

@@ -32,7 +32,12 @@ use App\Subject;
 			</div>
 			<div class="col">
 				<label for="event">Evento</label>
-				<select name="event" id="event" class="form-control"></select>
+				<select name="event" id="event" class="form-control">
+					<option value=""></option>
+					@foreach ( $events as $event )
+					<option value="{{ $event->id }}"{{ $request->get('event') ? ' selected="selected"' : '' }}>{{ $event->label }}</option>
+					@endforeach
+				</select>
 			</div>
 			<div class="col">
 				<label for="works">Trabaja</label>

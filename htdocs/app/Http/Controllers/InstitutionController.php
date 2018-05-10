@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Institution;
+use App\AddressComponent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
@@ -16,7 +17,10 @@ class InstitutionController extends Controller
      */
     public function index()
     {
-        return view('institutions.index');
+        $institutions = Institution::latest()->paginate( 10 );
+        return view('institutions.index', [
+            'institutions' => $institutions
+        ]);
     }
 
     /**
@@ -37,15 +41,24 @@ class InstitutionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store( Request $request )
     {
         $request->validate([
-            'name' => 'required|string|max:255'
+            'name'         => 'required|string|max:255',
+            'geo.lat'      => 'numeric',
+            'geo.lng'      => 'numeric',
+            'geo.location' => 'json'
         ]);
-        $institution = new Institution;
-        $institution->name = $request->input('name');
+        $institution             = new Institution;
+        $institution->name       = $request->input('name');
         $institution->created_by = Auth::id();
+        $institution->lat        = $request->input('geo.lat');
+        $institution->lng        = $request->input('geo.lng');
+        $institution->location   = $request->input('geo.location');
         $institution->save();
+
+        dd( $request->input('geo.location'), $institution->location );
+
         return Redirect::route('institutions.edit', $institution, 303);
     }
 
@@ -66,7 +79,7 @@ class InstitutionController extends Controller
      * @param  \App\Institution  $institution
      * @return \Illuminate\Http\Response
      */
-    public function edit(Institution $institution)
+    public function edit(Institution $institution, Request $request )
     {
         return view('institutions.create', [
             'institution' => $institution
@@ -82,7 +95,48 @@ class InstitutionController extends Controller
      */
     public function update(Request $request, Institution $institution)
     {
-        //
+        $request->validate([
+            'name'         => 'required|string|max:255',
+            'geo.lat'      => 'numeric',
+            'geo.lng'      => 'numeric',
+            'geo.location' => 'json'
+        ]);
+        $institution->name       = $request->input('name');
+        $institution->created_by = Auth::id();
+        $institution->lat        = $request->input('geo.lat');
+        $institution->lng        = $request->input('geo.lng');
+        $institution->location   = json_decode( $request->input('geo.location') );
+        $institution->save();
+
+        $location = json_decode( $request->input('geo.location') );
+
+        $old_address_components = AddressComponent::where('institution_id', $institution->id)->get();
+        $repeated_components = [];
+        foreach ( $location->address_components as $component ) {
+            foreach ( $component->types as $type ) {
+                $was_component = $old_address_components->first(function( $value, $key ) use ( $type, $component ) {
+                    return $value['type'] == $type && $value['short_name'] == $component->short_name;
+                });
+                if ( $was_component ) {
+                    $repeated_components[] = $was_component->id;
+                } else {
+                    $new_address = new AddressComponent([
+                        'institution_id' => $institution->id,
+                        'type'           => $type,
+                        'long_name'      => $component->long_name,
+                        'short_name'     => $component->short_name
+                    ]);
+                    $new_address->save();
+                }
+            }
+        }
+        foreach ( $old_address_components as $component ) {
+            if ( ! in_array( $component->id, $repeated_components ) ) {
+                $component->delete();
+            }
+        }
+
+        return Redirect::route('institutions.edit', $institution, 303);
     }
 
     /**

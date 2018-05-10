@@ -19,4 +19,8 @@ class Event extends Model
     {
         $this->attributes['label'] = filter_var( $val, FILTER_SANITIZE_STRING );
     }
+    public function institution()
+    {
+        return $this->belongsTo('App\Institution');
+    }
 }

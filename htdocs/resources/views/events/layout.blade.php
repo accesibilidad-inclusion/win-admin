@@ -10,10 +10,10 @@
 			<a href="{{ route('events.create') }}" class="nav-link{{ Request::routeIs('events.create') ? ' active' : ''}}">Crear nuevo evento</a>
 		</li>
 		<li class="nav-item">
-			<a href="#" class="nav-link">Instituciones</a>
+			<a href="{{ route('institutions.index') }}" class="nav-link{{ Request::routeIs('institutions.index') || Request::routeIs('institutions.show') ? ' active' : ''}}">Instituciones</a>
 		</li>
 		<li class="nav-item">
-			<a href="{{ route('institutions.create') }}" class="nav-link{{ Request::routeIs('institutions.create') ? ' active' : ''}}">Crear institución</a>
+			<a href="{{ route('institutions.create') }}" class="nav-link{{ Request::routeIs('institutions.create') || Request::routeIs('institutions.edit') ? ' active' : ''}}">Crear institución</a>
 		</li>
 	</ul>
 </nav>

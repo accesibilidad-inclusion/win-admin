@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Event;
 use App\Answer;
 use App\Subject;
 use App\Dimension;
@@ -28,6 +29,10 @@ class ReportController extends Controller
             $this->generateExport( $params );
         }
 
+        $events = Event::where([
+            'status' => 'active'
+        ])->get(['id', 'label']);
+
         $results = null;
         if ( ! empty( $params ) ) {
             $results = $this->buildReportResults( $params );
@@ -37,7 +42,8 @@ class ReportController extends Controller
             'impairments' => $impairments,
             'ages'        => $age_ranges,
             'results'     => $results,
-            'request'     => $request
+            'request'     => $request,
+            'events'      => $events
         ]);
     }
     private function generateExport( array $params )
@@ -153,12 +159,11 @@ class ReportController extends Controller
 
             $writer->addRow( $survey );
 
-
-            // \fputcsv( $fp, $survey );
         }
 
         $writer->close();
         exit;
+
         rewind( $fp );
         // obtener contenido del archivo como un string
         $output = stream_get_contents( $fp );

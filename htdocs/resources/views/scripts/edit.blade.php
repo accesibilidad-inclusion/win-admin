@@ -45,4 +45,5 @@
 <script type="text/javascript">
 var Script = @json( $script );
 </script>
+<script src="{{ asset('js/scripts.js') }}"></script>
 @endsection

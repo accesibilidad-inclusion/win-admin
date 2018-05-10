@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Event;
+use App\Institution;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 
 class EventController extends Controller
 {
@@ -23,7 +24,7 @@ class EventController extends Controller
     public function index()
     {
         return view('events.index', [
-            'events' => Event::latest()->take(10)->get()
+            'events' => Event::latest()->paginate( 10 )->load('institution')
         ]);
     }
 
@@ -38,8 +39,10 @@ class EventController extends Controller
         $event->starts_at = new \DateTime;
         $event->ends_at = new \DateTime;
         $event->ends_at->add( new \DateInterval('P1D') );
+        $institutions = Institution::get(['id', 'name'])->all();
         return view('events.create', [
-            'event' => $event
+            'event' => $event,
+            'institutions' => $institutions
         ]);
     }
 
@@ -93,7 +96,8 @@ class EventController extends Controller
     public function edit(Event $event)
     {
         return view('events.create', [
-            'event' => $event
+            'event' => $event,
+            'institutions' => Institution::get(['id', 'name'])->all()
         ]);
     }
 
@@ -106,6 +110,11 @@ class EventController extends Controller
      */
     public function update(Request $request, Event $event)
     {
+        $request->validate([
+            'institution_id' => 'nullable|integer|exists:institutions,id',
+            'starts_at'      => 'nullable|date_format:Y-m-d',
+            'ends_at'        => 'nullable|date_format:Y-m-d'
+        ]);
         $event->label = $request->input('label');
         if ( ! empty( $request->input('starts_at') ) ) {
             $starts_at = new \DateTime( $request->input('starts_at') );
@@ -119,6 +128,8 @@ class EventController extends Controller
         } else {
             $event->ends_at = null;
         }
+
+        $event->institution_id = (int) $request->input('institution_id');
         $event->status = $request->input('status') ?? 'active';
         $event->save();
         return Redirect::route('events.edit', $event, 303);
