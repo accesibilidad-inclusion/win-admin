@@ -11,3 +11,5 @@ htdocs/.env
 
 .vscode/
 htdocs/public/docs.html
+htdocs/public/js
+htdocs/public/mix-manifest.json
