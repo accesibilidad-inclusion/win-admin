@@ -1,10 +1,10 @@
 # TODO
 
 - [ ] Filtrar resultados grupales y exportación por evento
-- [ ] Agregar cabeceras de filas a exportación de datos
-- [x] Administración de Instituciones
 - [ ] Añadir indicadores estadísticos por pregunta
-- [ ] Filtros y búsqueda de preguntas
+- [x] Filtros y búsqueda de preguntas
+- [x] Agregar cabeceras de filas a exportación de datos
+- [x] Administración de Instituciones
 
 ---
 

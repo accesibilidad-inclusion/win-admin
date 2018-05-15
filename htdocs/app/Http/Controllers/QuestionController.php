@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Question;
+use App\Aid;
+use App\Option;
 use App\Category;
+use App\Question;
 use App\Dimension;
 use App\Assistance;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreQuestion;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Option;
 
 class QuestionController extends Controller
 {
@@ -26,10 +28,47 @@ class QuestionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index( Request $request )
     {
+		$questions = Question::with(['category', 'assistances']);
+		$params    = array_filter( $request->all() );
+		$query = [];
+		foreach ( $params as $key => $val ) {
+			switch ( $key ) {
+				case 'category_id':
+					$questions->where( $key, '=', $val );
+					break;
+				case 'dimension_id':
+					$dimension = Dimension::find( $val );
+					if ( $dimension->parent_id == 0 ) {
+						$questions->whereIn('dimension_id', Dimension::where('parent_id', $val)->pluck('id') );
+					} else {
+						$questions->where('dimension_id', '=', (int) $val );
+					}
+					break;
+				case 'assistance':
+					$questions->whereExists( function( $query ) use ( $val ) {
+						$query->select( DB::raw(1) )
+							->from( 'assistance_question' )
+							->whereRaw( 'question_id = questions.id' )
+							->where( 'assistance_id', '=', $val );
+					} );
+					break;
+				case 'formulation':
+					$questions->where('formulation', 'like', "%{$val}%");
+					break;
+			}
+		}
+		$questions = $questions->paginate( 10 );
+		foreach ( $params as $key => $val ) {
+			$questions->appends( $key, $val );
+		}
 		return view('questions.index', [
-			'questions' => Question::latest()->paginate( 10 )
+			'dimensions'  => Dimension::get(['id', 'label', 'parent_id']),
+			'categories'  => Category::get(['id', 'label']),
+			'assistances' => Assistance::get(['id', 'label']),
+			'questions'   => $questions,
+			'request'     => $request,
 		]);
     }
 
