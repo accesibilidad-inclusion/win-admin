@@ -57,8 +57,6 @@ class InstitutionController extends Controller
         $institution->location   = $request->input('geo.location');
         $institution->save();
 
-        dd( $request->input('geo.location'), $institution->location );
-
         return Redirect::route('institutions.edit', $institution, 303);
     }
 
