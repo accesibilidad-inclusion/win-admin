@@ -8,9 +8,11 @@ use App\Survey;
 use App\Subject;
 use App\Question;
 use App\Assistance;
+use App\Mail\SurveyResults;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\StoreSubject;
+use Illuminate\Support\Facades\Mail;
 
 /*
 |--------------------------------------------------------------------------
@@ -66,6 +68,20 @@ Route::prefix('v1')->group(function() {
 		$results = $survey->results;
 		unset( $results->answers );
 		return response( json_encode( $results ) );
+	});
+	Route::post('/surveys/{id}/results/notify', function( Request $request, int $id ){
+		$survey = Survey::where([
+			'id'   => $id,
+			'hash' => $request->header('X-WIN-SURVEY-HASH') ?? $request->get('hash')
+		])->firstOrFail();
+		if ( empty( $request->get('email') ) || ! filter_var( $request->get('email'), FILTER_VALIDATE_EMAIL ) ) {
+			return response( json_encode( false ), 422 );
+		}
+		\Debugbar::disable();
+		$survey->append('results');
+		$email = new SurveyResults( $survey );
+		Mail::to( $request->get('email') )->send( $email );
+		return response( json_encode( true ) );
 	});
 	Route::get('/events/{hash}', function( Request $request ){
 		$event = Event::where([

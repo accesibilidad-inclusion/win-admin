@@ -239,7 +239,7 @@ types:
                     body:
                         application/json:
                             type: Survey
-    /results:
+    /{id}/results:
         get:
             description: Obtener los resultados de la aplicación del cuestionario
             queryParameters:
@@ -255,6 +255,36 @@ types:
                     body:
                         application/json:
                             type: Result
+        /notify:
+            post:
+                description: Envía resultados de la aplicación a un correo electrónico
+                is: [ standardErrors ]
+                queryParameters:
+                    hash:
+                        description: Identificador de la aplicación (survey). Requerido si no se usa la cabecera X-WIN-SURVEY-HASH
+                        type: string
+                body:
+                    multipart/form-data:
+                    application/json:
+                        properties:
+                            email:
+                                type: string
+                                required: true
+                                description: Correo electrónico donde se envía la notificación
+                headers:
+                    X-WIN-SURVEY-HASH:
+                        description: Identificador de la aplicación (survey)
+                        type: string
+                responses:
+                    200:
+                        body:
+                            application/json:
+                                type: boolean
+                    422:
+                        description: Correo electrónico no válido o vacío
+                        body:
+                            application/json:
+                                type: boolean
     post:
         description: Crear una nueva aplicación
         body:
