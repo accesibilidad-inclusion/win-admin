@@ -65,7 +65,6 @@ use App\Subject;
 					</div>
 				</div>
 			</div>
-			{{ csrf_field() }}
 		</form>
 		@if ( $subjects )
 		<div class="mb-3">
