@@ -96,7 +96,7 @@ class ReportController extends Controller
                         $survey_subject_impairments_ids = [];
                     }
                     foreach ( $impairments as $key => $impairment ) {
-                        $rows[ $answer->survey ]['impairments'][ $key ] = in_array( $key, $survey_subject_impairments_ids ) ? 1 : 0;
+                        $rows[ $answer->survey ]['impairments'][ $impairment ] = in_array( $key, $survey_subject_impairments_ids ) ? 1 : 0;
                     }
                 }
             }
@@ -105,45 +105,26 @@ class ReportController extends Controller
         // no necesito más esto
         unset( $answers, $subject_impairments, $impairments );
 
-        // $answers_by_subject = $segment->answers->groupBy('subject_id');
-        // $rows = [];
-        // foreach ( $answers_by_subject as $subject_id => $answers ) {
-        //     $subject = $segment->subjects->find($subject_id);
-        //     foreach ( $subject->makeHidden([
-        //         'id',
-        //         'personal_id',
-        //         'given_name',
-        //         'family_name',
-        //         'consent_at',
-        //         'works_at',
-        //         'studies_at',
-        //         'last_connection_at',
-        //         'deleted_at',
-        //         'created_at',
-        //         'updated_at'
-        //     ])->toArray() as $key => $val ) {
-        //         $rows[ $subject_id ][ $key ] = $val;
-        //     }
-        //     foreach ( $answers as $answer ) {
-        //         $rows[ $subject_id ][ $answer->question->id ] = $answer->option->value;
-        //     }
-        // }
-        $fp = fopen('php://temp/maxmemory'. 16*1024*1024, 'r+');
-        // $headers = array_keys( current( $rows ) );
-        // array_unshift( $headers, 'subject' );
+        $first = current( $rows );
+
+        $headers = [];
+        foreach ( $first as $key => $val ) {
+            if ( is_array( $val ) ) {
+                foreach ( $val as $col => $vals ) {
+                    $headers[] = $col;
+                }
+            } else {
+                $headers[] = $key;
+            }
+        }
+        $headers = array_map(function( $input ){
+            return ucwords( $input );
+        }, $headers );
 
         // @todo exportación a XLS
         $writer = WriterFactory::create( Type::XLSX );
         $writer->openToBrowser( 'export-'. time().'.xlsx' );
-        // $writer->addRow( $headers );
-        // foreach ( $rows as $subject_id => $answers ) {
-        //     \array_unshift( $answers, $subject_id );
-        //     $writer->addRow( $answers );
-        // }
-        // $writer->close();
-
-        // \fputcsv( $fp, $headers );
-
+        $writer->addRow( $headers );
 
         foreach ( $rows as $row ) {
             $survey = [];
