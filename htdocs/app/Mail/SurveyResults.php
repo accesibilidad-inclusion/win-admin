@@ -31,9 +31,16 @@ class SurveyResults extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.results')
+        $this
+            ->subject('Resultados de tu evaluación con Win')
+            ->view('emails.results')
             ->with([
                 'results' => $this->survey->results
             ]);
+        $this->withSwiftMessage( function( $message ){
+            $message
+                ->getHeaders()
+                ->addTextHeader('Reply-To', 'win@ead.cl');
+        });
     }
 }
