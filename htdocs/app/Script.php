@@ -55,11 +55,23 @@ class Script extends Model
 		$questions = Question::findMany( $question_ids )->load('options');
 		$stages = [];
 		$i = 0;
+		$stage_titles = [
+			'Comencemos la primera parte',
+			'Sigamos con la segunda parte ',
+			'Vamos por la tercera parte',
+			'Cuarta parte y final'
+		];
+		$stage_texts = [
+			'Comencemos con las primeras preguntas',
+			'Sigamos avanzando',
+			'Ya vamos en la mitad! Lo has hecho muy bien',
+			'Ya no queda casi nada! Vas a completar este cuestionario muy pronto'
+		];
 		foreach ( $questions_order as $stage ) {
 			$stages[] = [
-				'name'        => 'Etapa '. ($i+1),
+				'name'        => $stage_titles[ $i ],
 				'id'          => ( $i + 1 ),
-				'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Hic, iure?',
+				'description' => $stage_texts[ $i ],
 				'questions'   => $questions->filter( function( $item ) use ( $stage ){
 					return in_array( $item->id, $stage );
 				})->values()

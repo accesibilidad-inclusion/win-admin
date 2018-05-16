@@ -74,13 +74,13 @@ html, body {
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum, vel sit natus quibusdam eum sed fuga corrupti iure quos eius itaque nemo consequuntur vero beatae, dolorem provident. Aliquam, odit, ab.</p><br>
+                                        <p>Estos son tus resultados de WIN:</p><br>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
                                     @foreach ( $results->dimensions as $dimension )
-                                        <table border="0" cellpadding="0" cellspacing="0" class="dimension">
+                                        <table border="0" cellpadding="0" cellspacing="0" class="dimension" width="100%">
                                             <tr>
                                                 <td class="dimension--title">
                                                     <img src="https://admin.apoyos.win/img/newsletter/dimension-{{ $dimension->id }}.png" alt="{{ $dimension->label }}" width="25" height="25">
@@ -92,7 +92,7 @@ html, body {
                                             </tr>
                                             <tr>
                                                 <td class="dimension--description">
-                                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum minima suscipit earum quidem inventore totam consequatur.</p>
+                                                    <p>{{ $dimension->aid }}</p>
                                                 </td>
                                             </tr>
                                         </table>

@@ -67,6 +67,9 @@ Route::prefix('v1')->group(function() {
 		$survey->append('results');
 		$results = $survey->results;
 		unset( $results->answers );
+		array_walk( $results->dimensions, function( &$item ){
+			unset( $item->answers );
+		} );
 		return response( json_encode( $results ) );
 	});
 	Route::post('/surveys/{id}/results/notify', function( Request $request, int $id ){
@@ -83,20 +86,20 @@ Route::prefix('v1')->group(function() {
 		Mail::to( $request->get('email') )->send( $email );
 		return response( json_encode( true ) );
 	});
-	// Route::get('/surveys/{id}/results/notify', function( Request $request, int $id ){
-	// 	$survey = Survey::where([
-	// 		'id'   => $id,
-	// 		'hash' => $request->header('X-WIN-SURVEY-HASH') ?? $request->get('hash')
-	// 	])->firstOrFail();
-	// 	if ( empty( $request->get('email') ) || ! filter_var( $request->get('email'), FILTER_VALIDATE_EMAIL ) ) {
-	// 		return response( json_encode( false ), 422 );
-	// 	}
-	// 	\Debugbar::disable();
-	// 	$survey->append('results');
-	// 	$email = new SurveyResults( $survey );
-	// 	Mail::to( $request->get('email') )->send( $email );
-	// 	return response( json_encode( true ) );
-	// });
+	Route::get('/surveys/{id}/results/notify', function( Request $request, int $id ){
+		$survey = Survey::where([
+			'id'   => $id,
+			'hash' => $request->header('X-WIN-SURVEY-HASH') ?? $request->get('hash')
+		])->firstOrFail();
+		if ( empty( $request->get('email') ) || ! filter_var( $request->get('email'), FILTER_VALIDATE_EMAIL ) ) {
+			return response( json_encode( false ), 422 );
+		}
+		\Debugbar::disable();
+		$survey->append('results');
+		$email = new SurveyResults( $survey );
+		Mail::to( $request->get('email') )->send( $email );
+		return response( json_encode( true ) );
+	});
 	Route::get('/events/{hash}', function( Request $request ){
 		$event = Event::where([
 			'hash'   => $request->hash,

@@ -35,7 +35,7 @@ class SurveyResults extends Mailable
             ->subject('Resultados de tu evaluación con Win')
             ->view('emails.results')
             ->with([
-                'results' => $this->survey->results
+                'results'  => $this->survey->results,
             ]);
         $this->withSwiftMessage( function( $message ){
             $message

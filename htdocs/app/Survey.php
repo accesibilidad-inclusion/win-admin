@@ -81,6 +81,30 @@ class Survey extends Model
 			'answered' => 0,
 			'level'    => ''
 		];
+
+        $msg_by_dimension_level = [
+            1 => [
+                'low' => 'Necesitas ayuda para poder tomar decisiones.',
+                'medium' => 'Decides cosas importantes para ti',
+                'high' => 'Tomas la iniciativa y decides qué cosas son importantes para ti'
+            ],
+            5 => [
+                'low' => 'Necesitas apoyo para identificar las cosas que te gustan',
+                'medium' => 'Aunque sabes lo que quieres tienes algunas dudas sobre cómo conseguirlo',
+                'high' => 'Sabes muy bien lo que quieres'
+            ],
+            9 => [
+                'low' => 'A veces haces cosas sin pensar mucho en las consecuencias. Es importante que pienses en lo que puede pasar cuando haces algo',
+                'medium' => 'Es necesario que pienses bien las cosas antes de hacerlas',
+                'high' => 'Piensas antes de hacer las cosas y eso te ayuda en tu vida'
+            ],
+            14 => [
+                'low' => 'Hay muchas cosas de ti que te gustaría cambiar. Seguro que también tienes muchas habilidades, piensa en ellas',
+                'medium' => 'Aunque te gusta cómo eres te importa mucho lo que piensen los demás sobre ti',
+                'high' => 'Te sientes bien siendo tú mismo y sabes que eres valioso'
+            ]
+        ];
+
 		foreach ( $dimensions_raw as $dimension ) {
 			unset( $dimension->parent_id, $dimension->created_at, $dimension->updated_at );
 			$dimension->values     = $dimension_values[ $dimension->id ] ?? [];
@@ -90,7 +114,6 @@ class Survey extends Model
 			$dimension->answered   = count( $dimension->values );
 			$dimension->max        = $dimension->answered * 6;
 			$dimension->min        = $dimension->answered * 1;
-
 			// añadir a resultados totales
 			$aggregated->answered += $dimension->answered;
 			$aggregated->score    += $dimension->score;
@@ -127,6 +150,9 @@ class Survey extends Model
 						$dimension->level = 'low';
 					}
 					break;
+			}
+			if ( $dimension->level ) {
+				$dimension->aid = $msg_by_dimension_level[ $dimension->id ][ $dimension->level ];
 			}
 
 			$dimension->stats = $this->buildStats( $dimension );
