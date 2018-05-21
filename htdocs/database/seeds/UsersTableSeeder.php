@@ -31,6 +31,6 @@ class UsersTableSeeder extends Seeder
             'name' => 'Vanessa Vega',
             'email' => 'vanessa.vega@pucv.cl',
             'password' => Hash::make( str_random() )
-        ])
+        ]);
     }
 }
