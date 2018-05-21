@@ -17,5 +17,20 @@ class UsersTableSeeder extends Seeder
             'email' => 'felipe@bloom-ux.com',
             'password' => Hash::make( env('ADMIN_USER_PASS') )
         ]);
+        DB::table('users')->insert([
+            'name' => 'Basilio Cáceres',
+            'email' => 'basilio@bloom-ux.com',
+            'password' => Hash::make( str_random() )
+        ]);
+        DB::table('users')->insert([
+            'name' => 'Herbert Spencer',
+            'email' => 'hspencer@ead.cl',
+            'password' => Hash::make( str_random() )
+        ]);
+        DB::table('users')->insert([
+            'name' => 'Vanessa Vega',
+            'email' => 'vanessa.vega@pucv.cl',
+            'password' => Hash::make( str_random() )
+        ])
     }
 }
