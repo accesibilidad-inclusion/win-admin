@@ -56,16 +56,16 @@ class Script extends Model
 		$stages = [];
 		$i = 0;
 		$stage_titles = [
-			'Comencemos la primera parte',
-			'Sigamos con la segunda parte ',
+			'Vamos a comenzar',
+			'¡Vas muy bien!',
 			'Vamos por la tercera parte',
-			'Cuarta parte y final'
+			'Ya queda poco'
 		];
 		$stage_texts = [
-			'Comencemos con las primeras preguntas',
-			'Sigamos avanzando',
-			'Ya vamos en la mitad! Lo has hecho muy bien',
-			'Ya no queda casi nada! Vas a completar este cuestionario muy pronto'
+			'Ahora iniciaremos el cuestionario',
+			'Sigamos avanzando, y vas muy bien!',
+			'Ya vamos en la mitad!',
+			'Quedan sólo las últimas preguntas. Vas a terminar muy pronto'
 		];
 		foreach ( $questions_order as $stage ) {
 			$stages[] = [
