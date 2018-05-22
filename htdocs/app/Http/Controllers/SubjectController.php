@@ -155,7 +155,10 @@ class SubjectController extends Controller
      */
     public function destroy(Subject $subject)
     {
+        foreach ( $subject->surveys() as $survey ) {
+            $survey->delete();
+        }
         $subject->delete();
-        return redirect( route('subjects.index', ['deleted' => 'ok'], 302) );
+        return redirect( route('subjects.index', [], 302) );
     }
 }
