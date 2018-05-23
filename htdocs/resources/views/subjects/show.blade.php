@@ -62,13 +62,13 @@
 							<div class="col-sm-3">
 								<h6>{{ $dimension->label }}</h6>
 								<div class="progress" style="height:2rem">
-									<div class="progress-bar @if ( $dimension->level == 'low' ) bg-danger @elseif ( $dimension->level == 'medium' ) bg-warning @else bg-success @endif" style="width:{{ $dimension->max > 0 ? ( $dimension->score / $dimension->max ) * 100 : 0 }}%" role="progressbar" aria-valuenow="{{ $dimension->score }}" aria-valuemax="{{ $dimension->max }}" aria-valuemin="{{ $dimension->min }}" data-level="{{ $dimension->level }}">
+									<div class="progress-bar" style="background-color: @if ( $dimension->level == 'low' ) rgba(0, 123, 255, 0.3) @elseif ( $dimension->level == 'medium' ) rgba(0, 123, 255, 0.6) @else rgba(0, 123, 255, 1) @endif; width:{{ $dimension->max > 0 ? ( $dimension->score / $dimension->max ) * 100 : 0 }}%" role="progressbar" aria-valuenow="{{ $dimension->score }}" aria-valuemax="{{ $dimension->max }}" aria-valuemin="{{ $dimension->min }}" data-level="{{ $dimension->level }}">
 										{{ $dimension->score }}/{{ $dimension->max }}
 									</div>
 								</div>
 								<div class="row m-1">
 									@foreach ( $dimension->answers as $answer )
-									<div class="col-3 @if ( $answer->option->value > 4 ) bg-success @elseif ( $answer->option->value > 2 ) bg-warning @else bg-danger @endif" style="height:1.5rem;box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #fff;" title="{{ $answer->question->id }}. {{ $answer->question->formulation }}"></div>
+									<div class="col-3" style="background-color: @if ( $answer->option->value > 4 ) rgba(0, 123, 255, 1) @elseif ( $answer->option->value > 2 ) rgba(0, 123, 255, 0.6) @else rgba(0, 123, 255, 0.3) @endif; height:1.5rem;box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #fff;" title="{{ $answer->question->id }}. {{ $answer->question->formulation }}"></div>
 									@endforeach
 								</div>
 							</div>
