@@ -8,6 +8,7 @@ use App\Survey;
 use App\Subject;
 use App\Question;
 use App\Assistance;
+use App\Impairment;
 use App\Mail\SurveyResults;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -227,5 +228,9 @@ Route::prefix('v1')->group(function() {
 		$subject->save();
 		return response( $subject->toJson() )
 			->setStatusCode( 201 );
+	});
+	Route::get('/impairments', function( ){
+		$impairments = Impairment::all();
+		return $impairments;
 	});
 });

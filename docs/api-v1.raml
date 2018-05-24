@@ -118,6 +118,11 @@ types:
             deleted_at?: string
             created_at: string
             updated_at: string
+    Impairment:
+        type: object
+        properties:
+            id: integer
+            label: string
     Result:
         type: object
         properties:
@@ -148,6 +153,16 @@ types:
             level:
                 enum: ['low', 'medium', 'high']
                 description: Nivel logrado por el usuario en la dimensión
+/impairments:
+    displayName: Discapacidades
+    get:
+        description: Obtener lista de discapacidades registradas en el sistema a las que se puede asociar un usuario
+        responses:
+            200:
+                description: Lista de discapacidades
+                body:
+                    application/json:
+                        type: Impairment
 /answers:
     displayName: Respuestas
     post:
