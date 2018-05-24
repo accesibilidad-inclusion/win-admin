@@ -6,7 +6,9 @@
             <div class="card mb-3">
                 <div class="card-body">
                     <h5 class="card-title">{{ $institution->name }}</h5>
+                    @if ( isset($institution->location->formatted_address) )
                     <p class="text-muted">{{ $institution->location->formatted_address }}</p>
+                    @endif
                     <form action="{{ route('institutions.destroy', $institution ) }}" method="POST">
                         {{ method_field('DELETE') }}
                         {{ csrf_field() }}
