@@ -202,7 +202,8 @@ Route::prefix('v1')->group(function() {
 			'birthday'           => 'date_format:Y-m-d',
 			'works_at'           => 'nullable|string|max:191',
 			'studies_at'         => 'nullable|string|max:191',
-            'personal_id'        => 'nullable|string|max:32',
+			'personal_id'        => 'nullable|string|max:32',
+			'impairments.*'      => 'integer|exists:impairments,id',
             'consent_at'         => 'date_format:Y-m-d H:i:s',
             'last_connection_at' => 'date_format:Y-m-d H:i:s',
 		]);
@@ -226,6 +227,12 @@ Route::prefix('v1')->group(function() {
 			}
 		}
 		$subject->save();
+
+		// impairments
+		$subject->impairments()->sync( $request->get('impairments') );
+
+		$subject->load('impairments');
+
 		return response( $subject->toJson() )
 			->setStatusCode( 201 );
 	});

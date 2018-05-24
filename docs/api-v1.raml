@@ -115,6 +115,7 @@ types:
             studies: boolean
             studies_at: string
             last_connection_at: string
+            impairments: integer[]
             deleted_at?: string
             created_at: string
             updated_at: string
@@ -345,6 +346,10 @@ types:
                         description: Debe indicar la fecha en que el sujeto dio su consentimiento para recopilar sus datos
                         type: datetime
                         required: true
+                    impairments:
+                        description: Tipo de discapacidades declaradas por el usuario, como array de ids. Obtener lista completa desde endpoint `impairments`
+                        required: false
+                        type: integer[]
                     works?: boolean
                     studies?: boolean
                     studies_at?: string
