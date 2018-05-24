@@ -11,7 +11,7 @@
 				<div class="form-group">
 					<p>Ubicación</p>
 					<div class="gmap">
-						<input type="text" class="gmap__search form-control" placeholder="Buscar dirección" value="{{ $institution->location->formatted_address }}">
+						<input type="text" class="gmap__search form-control" placeholder="Buscar dirección" value="{{ isset( $institution->location->formatted_address ) ? $institution->location->formatted_address : '' }}">
 						<div class="gmap__map mt-3" style="width:100%;height:400px;background:#ddd;border:1px solid #ccc;">
 						</div>
 						<input type="hidden" class="gmap__lat" name="geo[lat]" value="{{ $institution->lat }}">
