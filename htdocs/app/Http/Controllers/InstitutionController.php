@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Institution;
 use App\AddressComponent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 
@@ -58,8 +59,12 @@ class InstitutionController extends Controller
         $institution->created_by = Auth::id();
         $institution->lat        = $request->input('geo.lat');
         $institution->lng        = $request->input('geo.lng');
-        $institution->location   = $request->input('geo.location');
+        $institution->location   = json_decode( $request->input('geo.location') );
         $institution->save();
+
+        $location = json_decode( $request->input('geo.location') );
+
+        $this->saveAddressComponents( $institution, $location->address_components, collect() );
 
         return Redirect::route('institutions.edit', $institution, 303);
     }
@@ -111,12 +116,16 @@ class InstitutionController extends Controller
         $institution->save();
 
         $location = json_decode( $request->input('geo.location') );
+        $this->saveAddressComponents( $institution, $location->address_components, AddressComponent::where('institution_id', $institution->id)->get() );
 
-        $old_address_components = AddressComponent::where('institution_id', $institution->id)->get();
+        return Redirect::route('institutions.edit', $institution, 303);
+    }
+
+    private function saveAddressComponents( Institution $institution, array $new_components, Collection $old_components ){
         $repeated_components = [];
-        foreach ( $location->address_components as $component ) {
+        foreach ( $new_components as $component ) {
             foreach ( $component->types as $type ) {
-                $was_component = $old_address_components->first(function( $value, $key ) use ( $type, $component ) {
+                $was_component = $old_components->first(function( $value, $key ) use ( $type, $component ) {
                     return $value['type'] == $type && $value['short_name'] == $component->short_name;
                 });
                 if ( $was_component ) {
@@ -132,13 +141,11 @@ class InstitutionController extends Controller
                 }
             }
         }
-        foreach ( $old_address_components as $component ) {
+        foreach ( $old_components as $component ) {
             if ( ! in_array( $component->id, $repeated_components ) ) {
                 $component->delete();
             }
         }
-
-        return Redirect::route('institutions.edit', $institution, 303);
     }
 
     /**
