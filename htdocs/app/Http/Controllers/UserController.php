@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Http\Requests\StoreUser;
 use App\Notifications\UserCreated;
 use Illuminate\Support\Facades\Hash;
@@ -36,7 +37,9 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('users.create');
+        return view('users.create', [
+            'user' => new User
+        ]);
     }
 
     /**
@@ -77,7 +80,7 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        return view('users.edit', [
+        return view('users.create', [
 			'user' => $user
 		]);
     }
@@ -91,7 +94,14 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //
+        $request->validate([
+            'name' => 'required|string',
+            'email' => Rule::unique('users')->ignore( $user->email, 'email' )
+        ]);
+        $user->name = $request->get('name');
+        $user->email = $request->get('email');
+        $user->save();
+        return Redirect::route('users.edit', ['user' => $user], 303);
     }
 
     /**
