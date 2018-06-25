@@ -63,7 +63,7 @@ class Script extends Model
 		];
 		$stage_texts = [
 			'Ahora iniciaremos el cuestionario',
-			'Sigamos avanzando, y vas muy bien!',
+			'Sigamos avanzando, ya queda menos',
 			'Ya vamos en la mitad!',
 			'Quedan sólo las últimas preguntas. Vas a terminar muy pronto'
 		];
