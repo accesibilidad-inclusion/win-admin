@@ -10,7 +10,7 @@ use App\Subject;
 			<div class="col-12">
 				<h2>Filtrar</h2>
 			</div>
-			<div class="col">
+			<!-- <div class="col">
 				<label for="age_range">Rango de edad</label>
 				<select name="age_range" id="age_range" class="form-control">
 					<option value=""></option>
@@ -20,7 +20,7 @@ use App\Subject;
 					<option value="25-30">25-30</option>
 					<option value="31-35">31-35</option>
 				</select>
-			</div>
+			</div> -->
 			<div class="col">
 				<label for="sex">Sexo</label>
 				<select name="sex" id="sex" class="form-control">
@@ -32,10 +32,10 @@ use App\Subject;
 			</div>
 			<div class="col">
 				<label for="event">Evento</label>
-				<select name="event" id="event" class="form-control">
+				<select name="event_id" id="event" class="form-control">
 					<option value=""></option>
 					@foreach ( $events as $event )
-					<option value="{{ $event->id }}"{{ $request->get('event') ? ' selected="selected"' : '' }}>{{ $event->label }}</option>
+					<option value="{{ $event->id }}"{{ $request->get('event_id') && $event->id == $request->get('event_id') ? ' selected="selected"' : '' }}>{{ $event->label }}</option>
 					@endforeach
 				</select>
 			</div>

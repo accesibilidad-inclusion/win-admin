@@ -64,6 +64,7 @@ class ReportController extends Controller
             ->join('questions', 'answers.question_id', '=', 'questions.id')
             ->join('options', 'answers.option_id', '=', 'options.id')
             ->join('subjects', 'answers.subject_id', '=', 'subjects.id')
+            ->join('surveys', 'surveys.subject_id', '=', 'subjects.id')
             ->where( $subjects_query )
             ->addSelect([
                 'answers.subject_id',
@@ -106,21 +107,27 @@ class ReportController extends Controller
             }
             $rows[ $answer->survey ]['questions'][ $answer->question ] = $answer->value;
         }
+        foreach ( $rows as $key => $row ) {
+            ksort($row['questions']);
+            $rows[$key]['questions'] = $row['questions'];
+        }
         // no necesito más esto
         unset( $answers, $subject_impairments, $impairments );
 
         $first = current( $rows );
-
         $headers = [];
-        foreach ( $first as $key => $val ) {
-            if ( is_array( $val ) ) {
-                foreach ( $val as $col => $vals ) {
-                    $headers[] = $col;
+        if(!empty($first)) {
+            foreach ( $first as $key => $val ) {
+                if ( is_array( $val ) ) {
+                    foreach ( $val as $col => $vals ) {
+                        $headers[] = $col;
+                    }
+                } else {
+                    $headers[] = $key;
                 }
-            } else {
-                $headers[] = $key;
             }
         }
+        
         $headers = array_map(function( $input ){
             return ucwords( $input );
         }, $headers );
@@ -179,12 +186,13 @@ class ReportController extends Controller
             ->join('dimensions', 'questions.dimension_id', '=', 'dimensions.id')
             ->join('options', 'answers.option_id', '=', 'options.id')
             ->join('subjects', 'answers.subject_id', '=', 'subjects.id')
+            ->join('surveys', 'surveys.subject_id', '=', 'subjects.id')
             ->where( $subjects_query )
             ->groupBy(['dimensions.parent_id', 'options.value'])
             ->selectRaw('count(answers.subject_id) as q')
             ->addSelect(['options.value', 'dimensions.parent_id as dimension'])
             ->get();
-        $subjects = Subject::where( $subjects_query )->count('id');
+        $subjects = Subject::join('surveys', 'surveys.subject_id', '=', 'subjects.id')->where( $subjects_query )->count('subjects.id');
         return (object) [
             'answers'  => $answers,
             'subjects' => $subjects
